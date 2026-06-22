@@ -40,7 +40,7 @@ export default async function Navbar() {
         <div className="flex items-center gap-3">
           <Link
             href="/rezervasyon"
-            className="rounded-full bg-brown-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brown-600"
+            className="whitespace-nowrap rounded-full bg-brown-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brown-600 sm:px-5 sm:text-sm"
           >
             Rezervasyon Yap
           </Link>
