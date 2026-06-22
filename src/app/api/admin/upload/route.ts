@@ -14,7 +14,7 @@ function scheduleRestart() {
   child.unref();
 }
 
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/x-icon", "image/vnd.microsoft.icon"];
 const MAX_SIZE = 5 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
@@ -24,14 +24,14 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file");
   const targetRaw = formData.get("target");
-  const ALLOWED_TARGETS = ["cars", "logo", "hero"];
+  const ALLOWED_TARGETS = ["cars", "logo", "hero", "favicon"];
   const target = ALLOWED_TARGETS.includes(targetRaw as string) ? (targetRaw as string) : "cars";
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Dosya bulunamadı." }, { status: 400 });
   }
   if (!ALLOWED_TYPES.includes(file.type)) {
-    return NextResponse.json({ error: "Sadece JPG, PNG, WEBP veya GIF yükleyebilirsiniz." }, { status: 400 });
+    return NextResponse.json({ error: "Sadece JPG, PNG, WEBP, GIF veya ICO yükleyebilirsiniz." }, { status: 400 });
   }
   if (file.size > MAX_SIZE) {
     return NextResponse.json({ error: "Dosya 5MB'dan büyük olamaz." }, { status: 400 });

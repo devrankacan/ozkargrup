@@ -6,9 +6,15 @@ type Settings = {
   logoUrl: string | null;
   heroImageDesktopUrl: string | null;
   heroImageMobileUrl: string | null;
+  faviconUrl: string | null;
 };
 
-const emptySettings: Settings = { logoUrl: null, heroImageDesktopUrl: null, heroImageMobileUrl: null };
+const emptySettings: Settings = {
+  logoUrl: null,
+  heroImageDesktopUrl: null,
+  heroImageMobileUrl: null,
+  faviconUrl: null,
+};
 
 function ImageSetting({
   label,
@@ -17,6 +23,8 @@ function ImageSetting({
   previewClassName,
   onUpload,
   onRemove,
+  hideUploadWhenSet,
+  accept,
 }: {
   label: string;
   hint?: string;
@@ -24,6 +32,8 @@ function ImageSetting({
   previewClassName: string;
   onUpload: (file: File) => void;
   onRemove: () => void;
+  hideUploadWhenSet?: boolean;
+  accept?: string;
 }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -58,13 +68,15 @@ function ImageSetting({
       ) : (
         <p className="mb-4 text-sm text-brown-500">Henüz yüklenmedi.</p>
       )}
-      <input
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
-        onChange={handleChange}
-        disabled={uploading}
-        className="block w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
-      />
+      {!(hideUploadWhenSet && value) && (
+        <input
+          type="file"
+          accept={accept || "image/jpeg,image/png,image/webp,image/gif"}
+          onChange={handleChange}
+          disabled={uploading}
+          className="block w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
+        />
+      )}
       {uploading && <p className="mt-2 text-sm text-brown-500">Yükleniyor, sunucu güncelleniyor (birkaç saniye sürebilir)...</p>}
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>
@@ -152,6 +164,18 @@ export default function AdminAyarlarPage() {
           onUpload={(file) => upload(file, "hero", "heroImageMobileUrl")}
           onRemove={() => {
             if (confirm("Mobil arkaplan görselini kaldırmak istediğinize emin misiniz?")) patch("heroImageMobileUrl", null);
+          }}
+        />
+        <ImageSetting
+          label="Favicon"
+          hint="Tarayıcı sekmesinde görünen küçük site simgesi. Önerilen boyut: 32×32px veya 64×64px, kare (1:1) görsel."
+          value={settings.faviconUrl}
+          previewClassName="h-10 w-10 rounded-lg border border-brown-200 bg-brown-50 object-contain p-1"
+          accept="image/png,image/x-icon,image/vnd.microsoft.icon"
+          hideUploadWhenSet
+          onUpload={(file) => upload(file, "favicon", "faviconUrl")}
+          onRemove={() => {
+            if (confirm("Favicon'u kaldırmak istediğinize emin misiniz?")) patch("faviconUrl", null);
           }}
         />
       </div>

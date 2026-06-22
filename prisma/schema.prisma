@@ -71,6 +71,7 @@ model SiteSettings {
   logoUrl             String?
   heroImageDesktopUrl String?
   heroImageMobileUrl  String?
+  faviconUrl          String?
 }
 
 model NewsletterSubscriber {

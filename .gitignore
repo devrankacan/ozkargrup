@@ -53,3 +53,5 @@ next-env.d.ts
 !/public/uploads/logo/.gitkeep
 /public/uploads/hero/*
 !/public/uploads/hero/.gitkeep
+/public/uploads/favicon/*
+!/public/uploads/favicon/.gitkeep
