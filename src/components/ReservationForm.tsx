@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const WHATSAPP_NUMBER = "905616179731";
 
@@ -10,6 +10,12 @@ type Car = {
   brand: string;
   pricePerDay: number;
 };
+
+type BusyRange = { startDate: string; endDate: string };
+
+function rangesOverlap(aStart: string, aEnd: string, bStart: string, bEnd: string) {
+  return new Date(aStart) < new Date(bEnd) && new Date(aEnd) > new Date(bStart);
+}
 
 export default function ReservationForm({
   cars,
@@ -26,9 +32,35 @@ export default function ReservationForm({
 }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [carId, setCarId] = useState(defaultCarId || "");
+  const [startDate, setStartDate] = useState(defaultStartDate || "");
+  const [endDate, setEndDate] = useState(defaultEndDate || "");
+  const [busyRanges, setBusyRanges] = useState<BusyRange[]>([]);
+  const [dateError, setDateError] = useState("");
+
+  useEffect(() => {
+    if (!carId) {
+      setBusyRanges([]);
+      return;
+    }
+    fetch(`/api/araclar/${carId}/musait-degil`)
+      .then((res) => res.json())
+      .then(setBusyRanges)
+      .catch(() => setBusyRanges([]));
+  }, [carId]);
+
+  useEffect(() => {
+    if (!startDate || !endDate) {
+      setDateError("");
+      return;
+    }
+    const conflict = busyRanges.some((r) => rangesOverlap(startDate, endDate, r.startDate, r.endDate));
+    setDateError(conflict ? "Seçtiğin araç bu tarih aralığında dolu, lütfen farklı bir tarih seçin." : "");
+  }, [startDate, endDate, busyRanges]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (dateError) return;
     setStatus("loading");
     setErrorMsg("");
 
@@ -36,12 +68,12 @@ export default function ReservationForm({
     const carSelect = form.elements.namedItem("carId") as HTMLSelectElement;
     const carLabel = carSelect.options[carSelect.selectedIndex]?.text || "";
     const data = {
-      carId: carSelect.value,
+      carId,
       fullName: (form.elements.namedItem("fullName") as HTMLInputElement).value,
       email: (form.elements.namedItem("email") as HTMLInputElement).value,
       phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
-      startDate: (form.elements.namedItem("startDate") as HTMLInputElement).value,
-      endDate: (form.elements.namedItem("endDate") as HTMLInputElement).value,
+      startDate,
+      endDate,
       pickupPlace: (form.elements.namedItem("pickupPlace") as HTMLInputElement).value,
       dropoffPlace: (form.elements.namedItem("dropoffPlace") as HTMLInputElement).value,
       notes: (form.elements.namedItem("notes") as HTMLTextAreaElement).value,
@@ -106,7 +138,8 @@ export default function ReservationForm({
         <select
           name="carId"
           required
-          defaultValue={defaultCarId || ""}
+          value={carId}
+          onChange={(e) => setCarId(e.target.value)}
           className="w-full rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
         >
           <option value="" disabled>
@@ -149,7 +182,8 @@ export default function ReservationForm({
             name="startDate"
             type="date"
             required
-            defaultValue={defaultStartDate}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
             className="w-full rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
           />
         </div>
@@ -159,7 +193,8 @@ export default function ReservationForm({
             name="endDate"
             type="date"
             required
-            defaultValue={defaultEndDate}
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
             className="w-full rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
           />
         </div>
@@ -188,11 +223,12 @@ export default function ReservationForm({
         className="w-full rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
       />
 
+      {dateError && <p className="text-sm text-red-600">{dateError}</p>}
       {errorMsg && <p className="text-sm text-red-600">{errorMsg}</p>}
 
       <button
         type="submit"
-        disabled={status === "loading"}
+        disabled={status === "loading" || !!dateError}
         className="rounded-full bg-brown-500 px-6 py-2 font-semibold text-white transition hover:bg-brown-600 disabled:opacity-60"
       >
         {status === "loading" ? "Gönderiliyor..." : "Rezervasyon Talebi Gönder"}

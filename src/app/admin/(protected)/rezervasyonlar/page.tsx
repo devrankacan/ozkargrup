@@ -59,6 +59,7 @@ export default function AdminRezervasyonlarPage() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [formError, setFormError] = useState("");
 
   async function load() {
     const [resR, resC] = await Promise.all([
@@ -76,13 +77,19 @@ export default function AdminRezervasyonlarPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setFormError("");
     const url = editingId ? `/api/admin/rezervasyonlar/${editingId}` : "/api/admin/rezervasyonlar";
     const method = editingId ? "PATCH" : "POST";
-    await fetch(url, {
+    const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
+    if (!res.ok) {
+      const err = await res.json();
+      setFormError(err.error || "Bir hata oluştu.");
+      return;
+    }
     setForm(emptyForm);
     setEditingId(null);
     setShowForm(false);
@@ -92,6 +99,7 @@ export default function AdminRezervasyonlarPage() {
   function startEdit(r: Reservation) {
     setEditingId(r.id);
     setShowForm(true);
+    setFormError("");
     setForm({
       carId: r.carId,
       fullName: r.fullName,
@@ -109,12 +117,14 @@ export default function AdminRezervasyonlarPage() {
   function startCreate() {
     setEditingId(null);
     setForm(emptyForm);
+    setFormError("");
     setShowForm(true);
   }
 
   function cancelForm() {
     setEditingId(null);
     setForm(emptyForm);
+    setFormError("");
     setShowForm(false);
   }
 
@@ -154,6 +164,9 @@ export default function AdminRezervasyonlarPage() {
           onSubmit={handleSubmit}
           className="mb-10 grid gap-3 rounded-xl border border-brown-200 bg-white p-6 sm:grid-cols-2"
         >
+          {formError && (
+            <p className="sm:col-span-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{formError}</p>
+          )}
           <select
             required
             value={form.carId}

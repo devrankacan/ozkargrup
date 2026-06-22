@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { findOverlappingReservation } from "@/lib/reservations";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -12,6 +13,14 @@ export async function POST(req: NextRequest) {
   const car = await prisma.car.findUnique({ where: { id: carId } });
   if (!car) {
     return NextResponse.json({ error: "Seçilen araç bulunamadı." }, { status: 404 });
+  }
+
+  const overlapping = await findOverlappingReservation(carId, new Date(startDate), new Date(endDate));
+  if (overlapping) {
+    return NextResponse.json(
+      { error: "Seçilen araç bu tarihlerde dolu. Lütfen farklı bir tarih veya araç seçin." },
+      { status: 409 }
+    );
   }
 
   const reservation = await prisma.reservation.create({
