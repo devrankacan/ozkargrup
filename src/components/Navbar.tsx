@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/siteSettings";
+import MobileMenu from "@/components/MobileMenu";
 
 const links = [
   { href: "/", label: "Anasayfa" },
@@ -13,8 +14,8 @@ export default async function Navbar() {
   const settings = await getSiteSettings();
 
   return (
-    <header className="border-b border-brown-200 bg-white">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <header className="relative border-b border-brown-200 bg-white">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-6 py-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-brown-700">
           {settings.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -36,12 +37,15 @@ export default async function Navbar() {
             </Link>
           ))}
         </nav>
-        <Link
-          href="/rezervasyon"
-          className="rounded-full bg-brown-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brown-600"
-        >
-          Rezervasyon Yap
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/rezervasyon"
+            className="rounded-full bg-brown-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brown-600"
+          >
+            Rezervasyon Yap
+          </Link>
+          <MobileMenu links={links} />
+        </div>
       </div>
     </header>
   );
