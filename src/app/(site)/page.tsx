@@ -20,6 +20,11 @@ export default async function HomePage() {
     take: 2,
   });
 
+  const locations = await prisma.location.findMany({
+    where: { isActive: true },
+    orderBy: [{ order: "asc" }, { name: "asc" }],
+  });
+
   return (
     <div>
       <section className="relative overflow-hidden bg-brown-50">
@@ -63,7 +68,10 @@ export default async function HomePage() {
               kolayca seçin, online rezervasyon yapın ve yolculuğunuza güvenle başlayın.
             </p>
           </div>
-          <QuickBookingWidget cars={cars.map((c) => ({ id: c.id, brand: c.brand, name: c.name, pricePerDay: c.pricePerDay }))} />
+          <QuickBookingWidget
+            cars={cars.map((c) => ({ id: c.id, brand: c.brand, name: c.name, pricePerDay: c.pricePerDay }))}
+            locations={locations.map((l) => ({ id: l.id, name: l.name }))}
+          />
         </div>
       </section>
 

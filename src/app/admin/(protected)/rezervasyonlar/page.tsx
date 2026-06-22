@@ -23,6 +23,11 @@ type Car = {
   brand: string;
 };
 
+type Location = {
+  id: string;
+  name: string;
+};
+
 const statusLabels: Record<string, string> = {
   pending: "Bekliyor",
   confirmed: "Onaylandı",
@@ -55,6 +60,7 @@ function toDateInputValue(value: string) {
 export default function AdminRezervasyonlarPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [cars, setCars] = useState<Car[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -62,12 +68,14 @@ export default function AdminRezervasyonlarPage() {
   const [formError, setFormError] = useState("");
 
   async function load() {
-    const [resR, resC] = await Promise.all([
+    const [resR, resC, resL] = await Promise.all([
       fetch("/api/admin/rezervasyonlar"),
       fetch("/api/admin/araclar"),
+      fetch("/api/admin/lokasyonlar"),
     ]);
     setReservations(await resR.json());
     setCars(await resC.json());
+    setLocations(await resL.json());
     setLoading(false);
   }
 
@@ -223,18 +231,30 @@ export default function AdminRezervasyonlarPage() {
               className="w-full rounded-lg border border-brown-200 px-3 py-2"
             />
           </div>
-          <input
-            placeholder="Alış Yeri"
+          <select
             value={form.pickupPlace}
             onChange={(e) => setForm({ ...form, pickupPlace: e.target.value })}
             className="rounded-lg border border-brown-200 px-3 py-2"
-          />
-          <input
-            placeholder="İade Yeri"
+          >
+            <option value="">Alış yeri seçin</option>
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.name}>
+                {loc.name}
+              </option>
+            ))}
+          </select>
+          <select
             value={form.dropoffPlace}
             onChange={(e) => setForm({ ...form, dropoffPlace: e.target.value })}
             className="rounded-lg border border-brown-200 px-3 py-2"
-          />
+          >
+            <option value="">İade yeri seçin</option>
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.name}>
+                {loc.name}
+              </option>
+            ))}
+          </select>
           <select
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value })}

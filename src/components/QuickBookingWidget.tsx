@@ -9,7 +9,12 @@ type Car = {
   pricePerDay: number;
 };
 
-export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
+type Location = {
+  id: string;
+  name: string;
+};
+
+export default function QuickBookingWidget({ cars, locations }: { cars: Car[]; locations: Location[] }) {
   const router = useRouter();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -39,11 +44,17 @@ export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
           <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-brown-400">
             Alış Yeri
           </label>
-          <input
+          <select
             name="pickupPlace"
-            placeholder="Şehir / havalimanı / şube"
             className="w-full rounded-lg border border-brown-200 px-4 py-2.5 text-brown-700 outline-none focus:border-brown-400"
-          />
+          >
+            <option value="">Fark etmez</option>
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.name}>
+                {loc.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>

@@ -13,6 +13,8 @@ type Car = {
 
 type BusyRange = { startDate: string; endDate: string };
 
+type Location = { id: string; name: string };
+
 function rangesOverlap(aStart: string, aEnd: string, bStart: string, bEnd: string) {
   return new Date(aStart) < new Date(bEnd) && new Date(aEnd) > new Date(bStart);
 }
@@ -37,6 +39,16 @@ export default function ReservationForm({
   const [endDate, setEndDate] = useState(defaultEndDate || "");
   const [busyRanges, setBusyRanges] = useState<BusyRange[]>([]);
   const [dateError, setDateError] = useState("");
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [pickupPlace, setPickupPlace] = useState(defaultPickupPlace || "");
+  const [dropoffPlace, setDropoffPlace] = useState("");
+
+  useEffect(() => {
+    fetch("/api/lokasyonlar")
+      .then((res) => res.json())
+      .then(setLocations)
+      .catch(() => setLocations([]));
+  }, []);
 
   useEffect(() => {
     if (!carId) {
@@ -74,8 +86,8 @@ export default function ReservationForm({
       phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
       startDate,
       endDate,
-      pickupPlace: (form.elements.namedItem("pickupPlace") as HTMLInputElement).value,
-      dropoffPlace: (form.elements.namedItem("dropoffPlace") as HTMLInputElement).value,
+      pickupPlace,
+      dropoffPlace,
       notes: (form.elements.namedItem("notes") as HTMLTextAreaElement).value,
     };
 
@@ -106,6 +118,8 @@ export default function ReservationForm({
 
       setStatus("success");
       form.reset();
+      setPickupPlace("");
+      setDropoffPlace("");
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank");
     } catch {
       setErrorMsg("Bağlantı hatası, lütfen tekrar deneyin.");
@@ -201,19 +215,44 @@ export default function ReservationForm({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <input
-          name="pickupPlace"
-          required
-          placeholder="Alış Yeri"
-          defaultValue={defaultPickupPlace}
-          className="rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
-        />
-        <input
-          name="dropoffPlace"
-          required
-          placeholder="İade Yeri"
-          className="rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
-        />
+        <div>
+          <label className="mb-1 block text-sm font-medium text-brown-700">Alış Yeri</label>
+          <select
+            name="pickupPlace"
+            required
+            value={pickupPlace}
+            onChange={(e) => setPickupPlace(e.target.value)}
+            className="w-full rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
+          >
+            <option value="" disabled>
+              Alış yeri seçin
+            </option>
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.name}>
+                {loc.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-brown-700">İade Yeri</label>
+          <select
+            name="dropoffPlace"
+            required
+            value={dropoffPlace}
+            onChange={(e) => setDropoffPlace(e.target.value)}
+            className="w-full rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
+          >
+            <option value="" disabled>
+              İade yeri seçin
+            </option>
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.name}>
+                {loc.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <textarea
