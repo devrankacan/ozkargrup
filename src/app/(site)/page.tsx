@@ -131,27 +131,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {locations.length > 0 && (
-        <section className="bg-brown-50">
-          <div className="mx-auto max-w-6xl px-6 py-16">
-            <h2 className="mb-2 text-2xl font-bold text-brown-700">Alış / İade Lokasyonlarımız</h2>
-            <p className="mb-8 text-sm text-brown-500">
-              Aşağıdaki noktalardan aracınızı teslim alabilir, dilediğiniz lokasyona iade edebilirsiniz.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {locations.map((loc) => (
-                <span
-                  key={loc.id}
-                  className="rounded-full border border-brown-200 bg-white px-4 py-2 text-sm font-medium text-brown-600"
-                >
-                  {loc.name}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mb-8 flex items-end justify-between">
           <h2 className="text-2xl font-bold text-brown-700">Sıkça Sorulan Sorular</h2>
@@ -186,6 +165,27 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {locations.length > 0 && (
+        <section className="bg-brown-50">
+          <div className="mx-auto max-w-6xl px-6 py-16">
+            <h2 className="mb-2 text-2xl font-bold text-brown-700">Alış / İade Lokasyonlarımız</h2>
+            <p className="mb-8 text-sm text-brown-500">
+              Aşağıdaki noktalardan aracınızı teslim alabilir, dilediğiniz lokasyona iade edebilirsiniz.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {locations.map((loc) => (
+                <span
+                  key={loc.id}
+                  className="rounded-full border border-brown-200 bg-white px-4 py-2 text-sm font-medium text-brown-600"
+                >
+                  {loc.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="bg-brown-700">
         <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-6 py-12 sm:flex-row sm:items-center sm:justify-between">
