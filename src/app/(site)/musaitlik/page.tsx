@@ -49,6 +49,7 @@ export default async function MusaitlikPage({
 
   const requestedCar = carId ? allCars.find((c) => c.id === carId) : undefined;
   const requestedCarAvailable = requestedCar ? !bookedCarIds.has(requestedCar.id) : false;
+  const requestedCarThumb = requestedCar?.images[0]?.url || requestedCar?.imageUrl;
 
   const availableCars = allCars.filter((c) => !bookedCarIds.has(c.id) && c.id !== requestedCar?.id);
 
@@ -66,31 +67,59 @@ export default async function MusaitlikPage({
       {requestedCar && (
         <div className="mb-10">
           {requestedCarAvailable ? (
-            <div className="rounded-xl border border-green-200 bg-green-50 p-6">
-              <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-green-700">Müsait</p>
-              <h2 className="mb-2 text-xl font-bold text-brown-700">
-                {requestedCar.brand} {requestedCar.name}
-              </h2>
-              <p className="mb-4 text-brown-600">
-                Seçtiğin araç bu tarihler için müsait. Hemen rezervasyon talebinde bulunabilirsin.
-              </p>
-              <Link
-                href={buildReservationLink(requestedCar.id, startDate, endDate, pickupPlace)}
-                className="inline-block rounded-full bg-brown-500 px-6 py-2.5 font-semibold text-white transition hover:bg-brown-600"
-              >
-                Rezervasyon Yap
-              </Link>
+            <div className="flex flex-col gap-5 rounded-xl border border-green-200 bg-green-50 p-6 sm:flex-row">
+              <div className="flex h-40 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brown-100 text-brown-400 sm:w-56">
+                {requestedCarThumb ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={requestedCarThumb}
+                    alt={`${requestedCar.brand} ${requestedCar.name}`}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>{requestedCar.brand} {requestedCar.name}</span>
+                )}
+              </div>
+              <div className="flex flex-1 flex-col">
+                <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-green-700">Müsait</p>
+                <h2 className="mb-2 text-xl font-bold text-brown-700">
+                  {requestedCar.brand} {requestedCar.name}
+                </h2>
+                <p className="mb-4 text-brown-600">
+                  Seçtiğin araç bu tarihler için müsait. Hemen rezervasyon talebinde bulunabilirsin.
+                </p>
+                <Link
+                  href={buildReservationLink(requestedCar.id, startDate, endDate, pickupPlace)}
+                  className="inline-block w-fit rounded-full bg-brown-500 px-6 py-2.5 font-semibold text-white transition hover:bg-brown-600"
+                >
+                  Rezervasyon Yap
+                </Link>
+              </div>
             </div>
           ) : (
-            <div className="rounded-xl border border-red-200 bg-red-50 p-6">
-              <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-red-700">Dolu</p>
-              <h2 className="mb-2 text-xl font-bold text-brown-700">
-                {requestedCar.brand} {requestedCar.name}
-              </h2>
-              <p className="text-brown-600">
-                Üzgünüz, seçtiğin araç bu tarihlerde başka bir rezervasyonla dolu. Aşağıda aynı tarihler için müsait
-                alternatif araçları görebilirsin.
-              </p>
+            <div className="flex flex-col gap-5 rounded-xl border border-red-200 bg-red-50 p-6 sm:flex-row">
+              <div className="flex h-40 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg bg-brown-100 text-brown-400 sm:w-56">
+                {requestedCarThumb ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={requestedCarThumb}
+                    alt={`${requestedCar.brand} ${requestedCar.name}`}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span>{requestedCar.brand} {requestedCar.name}</span>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-red-700">Dolu</p>
+                <h2 className="mb-2 text-xl font-bold text-brown-700">
+                  {requestedCar.brand} {requestedCar.name}
+                </h2>
+                <p className="text-brown-600">
+                  Üzgünüz, seçtiğin araç bu tarihlerde başka bir rezervasyonla dolu. Aşağıda aynı tarihler için müsait
+                  alternatif araçları görebilirsin.
+                </p>
+              </div>
             </div>
           )}
         </div>
