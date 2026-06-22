@@ -30,12 +30,11 @@ export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/50 bg-white/20 p-6 shadow-xl shadow-brown-900/20 backdrop-blur-2xl sm:p-8">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent" />
-      <h2 className="relative mb-1 text-lg font-bold text-brown-800 drop-shadow-sm">Hızlı Rezervasyon</h2>
-      <p className="relative mb-5 text-sm text-brown-700">Aracını ve tarihlerini seç, hemen devam et.</p>
+    <div className="rounded-2xl border border-brown-200 bg-white p-6 shadow-lg shadow-brown-200/40 sm:p-8">
+      <h2 className="mb-1 text-lg font-bold text-brown-700">Hızlı Rezervasyon</h2>
+      <p className="mb-5 text-sm text-brown-500">Aracını ve tarihlerini seç, hemen devam et.</p>
 
-      <form onSubmit={handleSubmit} className="relative space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-brown-400">
             Alış Yeri
@@ -43,7 +42,7 @@ export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
           <input
             name="pickupPlace"
             placeholder="Şehir / havalimanı / şube"
-            className="w-full rounded-lg border border-brown-200 bg-white/70 px-4 py-2.5 text-brown-700 outline-none focus:border-brown-400 focus:bg-white"
+            className="w-full rounded-lg border border-brown-200 px-4 py-2.5 text-brown-700 outline-none focus:border-brown-400"
           />
         </div>
 
@@ -53,7 +52,7 @@ export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
           </label>
           <select
             name="carId"
-            className="w-full rounded-lg border border-brown-200 bg-white/70 px-4 py-2.5 text-brown-700 outline-none focus:border-brown-400 focus:bg-white"
+            className="w-full rounded-lg border border-brown-200 px-4 py-2.5 text-brown-700 outline-none focus:border-brown-400"
           >
             <option value="">Fark etmez</option>
             {cars.map((car) => (
@@ -73,7 +72,7 @@ export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
               name="startDate"
               type="date"
               required
-              className="w-full rounded-lg border border-brown-200 bg-white/70 px-3 py-2.5 text-brown-700 outline-none focus:border-brown-400 focus:bg-white"
+              className="w-full rounded-lg border border-brown-200 px-3 py-2.5 text-brown-700 outline-none focus:border-brown-400"
             />
           </div>
           <div>
@@ -84,7 +83,7 @@ export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
               name="endDate"
               type="date"
               required
-              className="w-full rounded-lg border border-brown-200 bg-white/70 px-3 py-2.5 text-brown-700 outline-none focus:border-brown-400 focus:bg-white"
+              className="w-full rounded-lg border border-brown-200 px-3 py-2.5 text-brown-700 outline-none focus:border-brown-400"
             />
           </div>
         </div>
