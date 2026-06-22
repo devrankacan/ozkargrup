@@ -9,7 +9,13 @@ export default function FloatingContactButton() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div
+      className="fixed z-[60] flex flex-col items-end gap-3"
+      style={{
+        bottom: "calc(env(safe-area-inset-bottom, 0px) + 1.5rem)",
+        right: "calc(env(safe-area-inset-right, 0px) + 1.5rem)",
+      }}
+    >
       {open && (
         <div className="flex flex-col items-end gap-2">
           <a
