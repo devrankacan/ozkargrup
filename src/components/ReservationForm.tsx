@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+const WHATSAPP_NUMBER = "905616179731";
+
 type Car = {
   id: string;
   name: string;
@@ -31,8 +33,10 @@ export default function ReservationForm({
     setErrorMsg("");
 
     const form = e.currentTarget;
+    const carSelect = form.elements.namedItem("carId") as HTMLSelectElement;
+    const carLabel = carSelect.options[carSelect.selectedIndex]?.text || "";
     const data = {
-      carId: (form.elements.namedItem("carId") as HTMLSelectElement).value,
+      carId: carSelect.value,
       fullName: (form.elements.namedItem("fullName") as HTMLInputElement).value,
       email: (form.elements.namedItem("email") as HTMLInputElement).value,
       phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
@@ -55,8 +59,22 @@ export default function ReservationForm({
         setStatus("error");
         return;
       }
+
+      const lines = [
+        "Merhaba, bir rezervasyon talebim var.",
+        `Araç: ${carLabel}`,
+        `Tarih: ${new Date(data.startDate).toLocaleDateString("tr-TR")} - ${new Date(data.endDate).toLocaleDateString("tr-TR")}`,
+        `Alış Yeri: ${data.pickupPlace}`,
+        `İade Yeri: ${data.dropoffPlace}`,
+        `Ad Soyad: ${data.fullName}`,
+        `Telefon: ${data.phone}`,
+      ];
+      if (data.notes) lines.push(`Not: ${data.notes}`);
+      const message = encodeURIComponent(lines.join("\n"));
+
       setStatus("success");
       form.reset();
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank");
     } catch {
       setErrorMsg("Bağlantı hatası, lütfen tekrar deneyin.");
       setStatus("error");
@@ -66,7 +84,17 @@ export default function ReservationForm({
   if (status === "success") {
     return (
       <p className="rounded-lg bg-brown-100 p-4 text-brown-700">
-        Rezervasyon talebiniz alındı. Ekibimiz en kısa sürede sizinle iletişime geçecek.
+        Rezervasyon talebiniz alındı. WhatsApp üzerinden mesajınızı göndererek talebinizi tamamlayabilirsiniz —
+        açılmadıysa{" "}
+        <a
+          href={`https://wa.me/${WHATSAPP_NUMBER}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold underline"
+        >
+          buraya tıklayın
+        </a>
+        .
       </p>
     );
   }
@@ -167,7 +195,7 @@ export default function ReservationForm({
         disabled={status === "loading"}
         className="rounded-full bg-brown-500 px-6 py-2 font-semibold text-white transition hover:bg-brown-600 disabled:opacity-60"
       >
-        {status === "loading" ? "Gönderiliyor..." : "Rezervasyon Talebi Gönder"}
+        {status === "loading" ? "Gönderiliyor..." : "Rezervasyon Talebi Gönder (WhatsApp)"}
       </button>
     </form>
   );
