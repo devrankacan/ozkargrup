@@ -7,6 +7,8 @@ const pageLinks = [
   { href: "/araclar", label: "Araçlar" },
   { href: "/kampanyalar", label: "Kampanyalar" },
   { href: "/hakkimizda", label: "Hakkımızda" },
+  { href: "/sss", label: "Sıkça Sorulan Sorular" },
+  { href: "/kiralama-sartlari", label: "Kiralama Şartları" },
   { href: "/iletisim", label: "İletişim" },
   { href: "/rezervasyon", label: "Rezervasyon Yap" },
 ];

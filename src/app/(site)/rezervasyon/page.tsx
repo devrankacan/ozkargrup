@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import ReservationForm from "@/components/ReservationForm";
+
+export const metadata: Metadata = {
+  title: "Rezervasyon | Özkar Grup Rent a Car",
+  description: "Özkar Grup Rent a Car ile online rezervasyon talebi oluşturun.",
+};
 
 export default async function RezervasyonPage({
   searchParams,

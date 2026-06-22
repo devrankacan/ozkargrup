@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "Kampanyalar | Özkar Grup Rent a Car",
+  description: "Özkar Grup Rent a Car güncel kampanya ve fırsatlarını inceleyin.",
+};
 
 export default async function KampanyalarPage() {
   const campaigns = await prisma.campaign.findMany({

@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
+
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "Hakkımızda | Özkar Grup Rent a Car",
+  description: "Özkar Grup Rent a Car hakkında: misyonumuz, vizyonumuz ve neden bizi seçmelisiniz.",
+};
 
 export default function HakkimizdaPage() {
   return (

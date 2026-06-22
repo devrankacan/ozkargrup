@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import ContactForm from "@/components/ContactForm";
 
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "İletişim | Özkar Grup Rent a Car",
+  description: "Özkar Grup Rent a Car ile iletişime geçin: telefon, e-posta ve adres bilgilerimiz.",
+};
 
 export default function IletisimPage() {
   return (

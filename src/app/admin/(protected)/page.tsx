@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboardPage() {
-  const [carCount, reservationCount, pendingCount, messageCount] = await Promise.all([
+  const [carCount, reservationCount, pendingCount, messageCount, subscriberCount] = await Promise.all([
     prisma.car.count(),
     prisma.reservation.count(),
     prisma.reservation.count({ where: { status: "pending" } }),
     prisma.contactMessage.count(),
+    prisma.newsletterSubscriber.count(),
   ]);
 
   const stats = [
@@ -13,6 +14,7 @@ export default async function AdminDashboardPage() {
     { label: "Toplam Rezervasyon", value: reservationCount },
     { label: "Bekleyen Rezervasyon", value: pendingCount },
     { label: "Mesajlar", value: messageCount },
+    { label: "Bülten Aboneleri", value: subscriberCount },
   ];
 
   return (

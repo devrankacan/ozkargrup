@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Özkar Grup Rent a Car",
-  description: "Güvenilir ve konforlu araç kiralama hizmeti.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Özkar Grup Rent a Car",
+    template: "%s",
+  },
+  description: "Güvenilir ve konforlu araç kiralama hizmeti. Geniş araç filomuzdan size en uygun aracı seçin, online rezervasyon yapın.",
+  openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    siteName: "Özkar Grup Rent a Car",
+    title: "Özkar Grup Rent a Car",
+    description: "Güvenilir ve konforlu araç kiralama hizmeti.",
+  },
 };
 
 export default function RootLayout({
