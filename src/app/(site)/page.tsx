@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import QuickBookingWidget from "@/components/QuickBookingWidget";
+import { getSiteSettings } from "@/lib/siteSettings";
 
 export const revalidate = 0;
 
 export default async function HomePage() {
+  const settings = await getSiteSettings();
   const cars = await prisma.car.findMany({
     where: { isActive: true },
     orderBy: { createdAt: "desc" },
@@ -20,13 +22,42 @@ export default async function HomePage() {
 
   return (
     <div>
-      <section className="bg-brown-50">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+      <section className="relative overflow-hidden bg-brown-50">
+        {(settings.heroImageDesktopUrl || settings.heroImageMobileUrl) && (
+          <>
+            {settings.heroImageMobileUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={settings.heroImageMobileUrl}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover md:hidden"
+              />
+            )}
+            {settings.heroImageDesktopUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={settings.heroImageDesktopUrl}
+                alt=""
+                className={`absolute inset-0 h-full w-full object-cover ${settings.heroImageMobileUrl ? "hidden md:block" : ""}`}
+              />
+            )}
+            <div className="absolute inset-0 bg-brown-900/30 backdrop-blur-[2px]" />
+          </>
+        )}
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[1.1fr_1fr] lg:items-center">
           <div className="flex flex-col items-start gap-6">
-            <h1 className="text-4xl font-bold text-brown-700 md:text-5xl">
+            <h1
+              className={`text-4xl font-bold md:text-5xl ${
+                settings.heroImageDesktopUrl || settings.heroImageMobileUrl ? "text-white drop-shadow-md" : "text-brown-700"
+              }`}
+            >
               Yolculuğunuz İçin Güvenilir Araç Kiralama
             </h1>
-            <p className="max-w-xl text-brown-600">
+            <p
+              className={`max-w-xl ${
+                settings.heroImageDesktopUrl || settings.heroImageMobileUrl ? "text-white/90 drop-shadow" : "text-brown-600"
+              }`}
+            >
               Özkar Grup Rent a Car ile geniş araç filomuzdan size en uygun aracı
               kolayca seçin, online rezervasyon yapın ve yolculuğunuza güvenle başlayın.
             </p>

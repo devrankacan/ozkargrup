@@ -30,7 +30,7 @@ export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-brown-200 bg-white p-6 shadow-lg shadow-brown-200/40 sm:p-8">
+    <div className="rounded-2xl border border-white/40 bg-white/80 p-6 shadow-lg shadow-brown-900/10 backdrop-blur-md sm:p-8">
       <h2 className="mb-1 text-lg font-bold text-brown-700">Hızlı Rezervasyon</h2>
       <p className="mb-5 text-sm text-brown-500">Aracını ve tarihlerini seç, hemen devam et.</p>
 

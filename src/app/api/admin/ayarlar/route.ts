@@ -16,10 +16,16 @@ export async function PATCH(req: NextRequest) {
   if (error) return error;
 
   const body = await req.json();
+  const fields = ["logoUrl", "heroImageDesktopUrl", "heroImageMobileUrl"] as const;
+  const data: Record<string, string | null> = {};
+  for (const field of fields) {
+    if (field in body) data[field] = body[field] ?? null;
+  }
+
   const settings = await prisma.siteSettings.upsert({
     where: { id: "main" },
-    update: { logoUrl: body.logoUrl ?? null },
-    create: { id: "main", logoUrl: body.logoUrl ?? null },
+    update: data,
+    create: { id: "main", ...data },
   });
   return NextResponse.json(settings);
 }

@@ -51,3 +51,5 @@ next-env.d.ts
 !/public/uploads/cars/.gitkeep
 /public/uploads/logo/*
 !/public/uploads/logo/.gitkeep
+/public/uploads/hero/*
+!/public/uploads/hero/.gitkeep

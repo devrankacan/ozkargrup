@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file");
   const targetRaw = formData.get("target");
-  const target = targetRaw === "logo" ? "logo" : "cars";
+  const ALLOWED_TARGETS = ["cars", "logo", "hero"];
+  const target = ALLOWED_TARGETS.includes(targetRaw as string) ? (targetRaw as string) : "cars";
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Dosya bulunamadı." }, { status: 400 });

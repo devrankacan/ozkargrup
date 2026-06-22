@@ -67,8 +67,10 @@ model Campaign {
 }
 
 model SiteSettings {
-  id       String  @id @default("main")
-  logoUrl  String?
+  id                  String  @id @default("main")
+  logoUrl             String?
+  heroImageDesktopUrl String?
+  heroImageMobileUrl  String?
 }
 
 model NewsletterSubscriber {
