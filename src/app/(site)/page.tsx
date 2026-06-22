@@ -140,6 +140,96 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <h2 className="mb-8 text-2xl font-bold text-brown-700">Neden Özkar Grup Rent a Car?</h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { title: "Geniş Araç Filosu", desc: "Her ihtiyaca uygun, bakımlı ve güncel araç seçenekleri." },
+            { title: "Şeffaf Fiyatlandırma", desc: "Sürpriz ücret yok, gördüğünüz fiyat ödeyeceğiniz fiyattır." },
+            { title: "Hızlı Rezervasyon", desc: "Online formla dakikalar içinde rezervasyon talebi oluşturun." },
+            { title: "7/24 Destek", desc: "WhatsApp ve telefon hattımızdan her an yanınızdayız." },
+          ].map((item) => (
+            <div key={item.title} className="rounded-xl border border-brown-200 bg-white p-6 shadow-sm">
+              <h3 className="font-semibold text-brown-700">{item.title}</h3>
+              <p className="mt-2 text-sm text-brown-500">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {locations.length > 0 && (
+        <section className="bg-brown-50">
+          <div className="mx-auto max-w-6xl px-6 py-16">
+            <h2 className="mb-2 text-2xl font-bold text-brown-700">Alış / İade Lokasyonlarımız</h2>
+            <p className="mb-8 text-sm text-brown-500">
+              Aşağıdaki noktalardan aracınızı teslim alabilir, dilediğiniz lokasyona iade edebilirsiniz.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {locations.map((loc) => (
+                <span
+                  key={loc.id}
+                  className="rounded-full border border-brown-200 bg-white px-4 py-2 text-sm font-medium text-brown-600"
+                >
+                  {loc.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mb-8 flex items-end justify-between">
+          <h2 className="text-2xl font-bold text-brown-700">Sıkça Sorulan Sorular</h2>
+          <Link href="/sss" className="text-sm font-medium text-brown-500 hover:text-brown-700">
+            Tüm soruları gör →
+          </Link>
+        </div>
+        <div className="space-y-3">
+          {[
+            {
+              q: "Araç kiralamak için kaç yaşında olmam gerekir?",
+              a: "Araçlarımızı kiralayabilmek için en az 21 yaşında olmanız ve en az 1 yıllık ehliyet sahibi olmanız gerekmektedir.",
+            },
+            {
+              q: "Depozito alınıyor mu?",
+              a: "Evet, araç tesliminde kredi kartından bloke şeklinde bir depozito alınır ve araç hasarsız teslim edildiğinde kaldırılır.",
+            },
+            {
+              q: "Aracı farklı bir şehirde teslim edebilir miyim?",
+              a: "Şehirler arası teslim seçeneğimiz mevcuttur, rezervasyon sırasında alış ve iade lokasyonlarını farklı seçebilirsiniz.",
+            },
+          ].map((item) => (
+            <details key={item.q} className="group rounded-xl border border-brown-200 bg-white p-4">
+              <summary className="cursor-pointer list-none font-semibold text-brown-700 marker:content-none">
+                <span className="flex items-center justify-between gap-3">
+                  {item.q}
+                  <span className="shrink-0 text-brown-400 transition group-open:rotate-45">+</span>
+                </span>
+              </summary>
+              <p className="mt-3 text-sm text-brown-600">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-brown-700">
+        <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-6 py-12 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-white">Kiralama şartlarımızı incelediniz mi?</h2>
+            <p className="mt-1 text-sm text-brown-100">
+              Ehliyet, depozito, sigorta ve yakıt politikamız hakkında bilgi alın.
+            </p>
+          </div>
+          <Link
+            href="/kiralama-sartlari"
+            className="shrink-0 rounded-full bg-white px-6 py-2 font-semibold text-brown-700 transition hover:bg-brown-50"
+          >
+            Kiralama Şartları
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
