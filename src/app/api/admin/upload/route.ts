@@ -2,7 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
+import { spawn } from "child_process";
 import { requireAdmin } from "@/lib/requireAdmin";
+
+function scheduleRestart() {
+  if (!process.env.PM2_APP_NAME) return;
+  const child = spawn("sh", ["-c", `sleep 2 && pm2 restart ${process.env.PM2_APP_NAME}`], {
+    detached: true,
+    stdio: "ignore",
+  });
+  child.unref();
+}
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -31,6 +41,7 @@ export async function POST(req: NextRequest) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(filePath, buffer);
+  scheduleRestart();
 
   return NextResponse.json({ url: `/uploads/cars/${filename}` });
 }
