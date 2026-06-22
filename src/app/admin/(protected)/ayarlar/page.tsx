@@ -65,7 +65,7 @@ function ImageSetting({
         disabled={uploading}
         className="block w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
       />
-      {uploading && <p className="mt-2 text-sm text-brown-500">Yükleniyor...</p>}
+      {uploading && <p className="mt-2 text-sm text-brown-500">Yükleniyor, sunucu güncelleniyor (birkaç saniye sürebilir)...</p>}
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>
   );
@@ -94,6 +94,19 @@ export default function AdminAyarlarPage() {
     setSettings((s) => ({ ...s, [field]: value }));
   }
 
+  async function waitUntilAvailable(url: string, timeoutMs = 15000) {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      try {
+        const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+        if (res.ok) return;
+      } catch {
+        // henüz hazır değil, tekrar denenecek
+      }
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  }
+
   async function upload(file: File, target: string, field: keyof Settings) {
     const body = new FormData();
     body.append("file", file);
@@ -101,6 +114,7 @@ export default function AdminAyarlarPage() {
     const res = await fetch("/api/admin/upload", { method: "POST", body });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
+    await waitUntilAvailable(data.url);
     await patch(field, data.url);
   }
 

@@ -72,6 +72,19 @@ export default function AdminAraclarPage() {
     setForm({ ...form, imagesText: urls.join("\n") });
   }
 
+  async function waitUntilAvailable(url: string, timeoutMs = 15000) {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      try {
+        const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+        if (res.ok) return;
+      } catch {
+        // henüz hazır değil, tekrar denenecek
+      }
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  }
+
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -87,6 +100,7 @@ export default function AdminAraclarPage() {
         setUploadError(data.error || "Yükleme başarısız oldu.");
         continue;
       }
+      await waitUntilAvailable(data.url);
       uploaded.push(data.url);
     }
     setImagesList([...imagesList(), ...uploaded]);
@@ -200,7 +214,7 @@ export default function AdminAraclarPage() {
             disabled={uploading}
             className="block w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
           />
-          {uploading && <p className="mt-1 text-sm text-brown-500">Yükleniyor...</p>}
+          {uploading && <p className="mt-1 text-sm text-brown-500">Yükleniyor, sunucu güncelleniyor (birkaç saniye sürebilir)...</p>}
           {uploadError && <p className="mt-1 text-sm text-red-600">{uploadError}</p>}
           {imagesList().length > 0 && (
             <div className="mt-3 flex flex-wrap gap-3">
