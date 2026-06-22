@@ -7,10 +7,22 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (error) return error;
 
   const { id } = await params;
-  const { status } = await req.json();
+  const body = await req.json();
   const reservation = await prisma.reservation.update({
     where: { id },
-    data: { status },
+    data: {
+      carId: body.carId,
+      fullName: body.fullName,
+      email: body.email,
+      phone: body.phone,
+      startDate: body.startDate ? new Date(body.startDate) : undefined,
+      endDate: body.endDate ? new Date(body.endDate) : undefined,
+      pickupPlace: body.pickupPlace,
+      dropoffPlace: body.dropoffPlace,
+      notes: body.notes,
+      status: body.status,
+    },
+    include: { car: true },
   });
   return NextResponse.json(reservation);
 }

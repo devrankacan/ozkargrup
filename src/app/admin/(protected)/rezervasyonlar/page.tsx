@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 type Reservation = {
   id: string;
+  carId: string;
   fullName: string;
   email: string;
   phone: string;
@@ -13,7 +14,13 @@ type Reservation = {
   dropoffPlace: string;
   notes: string | null;
   status: string;
-  car: { brand: string; name: string };
+  car: { id: string; brand: string; name: string };
+};
+
+type Car = {
+  id: string;
+  name: string;
+  brand: string;
 };
 
 const statusLabels: Record<string, string> = {
@@ -28,19 +35,88 @@ const statusColors: Record<string, string> = {
   cancelled: "bg-red-100 text-red-700",
 };
 
+const emptyForm = {
+  carId: "",
+  fullName: "",
+  email: "",
+  phone: "",
+  startDate: "",
+  endDate: "",
+  pickupPlace: "",
+  dropoffPlace: "",
+  notes: "",
+  status: "confirmed",
+};
+
+function toDateInputValue(value: string) {
+  return value ? value.slice(0, 10) : "";
+}
+
 export default function AdminRezervasyonlarPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   async function load() {
-    const res = await fetch("/api/admin/rezervasyonlar");
-    setReservations(await res.json());
+    const [resR, resC] = await Promise.all([
+      fetch("/api/admin/rezervasyonlar"),
+      fetch("/api/admin/araclar"),
+    ]);
+    setReservations(await resR.json());
+    setCars(await resC.json());
     setLoading(false);
   }
 
   useEffect(() => {
     load();
   }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const url = editingId ? `/api/admin/rezervasyonlar/${editingId}` : "/api/admin/rezervasyonlar";
+    const method = editingId ? "PATCH" : "POST";
+    await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    setForm(emptyForm);
+    setEditingId(null);
+    setShowForm(false);
+    load();
+  }
+
+  function startEdit(r: Reservation) {
+    setEditingId(r.id);
+    setShowForm(true);
+    setForm({
+      carId: r.carId,
+      fullName: r.fullName,
+      email: r.email,
+      phone: r.phone,
+      startDate: toDateInputValue(r.startDate),
+      endDate: toDateInputValue(r.endDate),
+      pickupPlace: r.pickupPlace,
+      dropoffPlace: r.dropoffPlace,
+      notes: r.notes || "",
+      status: r.status,
+    });
+  }
+
+  function startCreate() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setShowForm(true);
+  }
+
+  function cancelForm() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setShowForm(false);
+  }
 
   async function updateStatus(id: string, status: string) {
     await fetch(`/api/admin/rezervasyonlar/${id}`, {
@@ -61,7 +137,121 @@ export default function AdminRezervasyonlarPage() {
 
   return (
     <div>
-      <h1 className="mb-8 text-2xl font-bold text-brown-700">Rezervasyonlar</h1>
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-brown-700">Rezervasyonlar</h1>
+        {!showForm && (
+          <button
+            onClick={startCreate}
+            className="rounded-lg bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600"
+          >
+            + Yeni Rezervasyon (Elden)
+          </button>
+        )}
+      </div>
+
+      {showForm && (
+        <form
+          onSubmit={handleSubmit}
+          className="mb-10 grid gap-3 rounded-xl border border-brown-200 bg-white p-6 sm:grid-cols-2"
+        >
+          <select
+            required
+            value={form.carId}
+            onChange={(e) => setForm({ ...form, carId: e.target.value })}
+            className="rounded-lg border border-brown-200 px-3 py-2 sm:col-span-2"
+          >
+            <option value="" disabled>
+              Araç seçin
+            </option>
+            {cars.map((car) => (
+              <option key={car.id} value={car.id}>
+                {car.brand} {car.name}
+              </option>
+            ))}
+          </select>
+          <input
+            required
+            placeholder="Ad Soyad"
+            value={form.fullName}
+            onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+            className="rounded-lg border border-brown-200 px-3 py-2"
+          />
+          <input
+            required
+            placeholder="Telefon"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            className="rounded-lg border border-brown-200 px-3 py-2"
+          />
+          <input
+            type="email"
+            placeholder="E-posta (opsiyonel)"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            className="rounded-lg border border-brown-200 px-3 py-2 sm:col-span-2"
+          />
+          <div>
+            <label className="mb-1 block text-sm font-medium text-brown-700">Alış Tarihi</label>
+            <input
+              required
+              type="date"
+              value={form.startDate}
+              onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+              className="w-full rounded-lg border border-brown-200 px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-brown-700">İade Tarihi</label>
+            <input
+              required
+              type="date"
+              value={form.endDate}
+              onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+              className="w-full rounded-lg border border-brown-200 px-3 py-2"
+            />
+          </div>
+          <input
+            placeholder="Alış Yeri"
+            value={form.pickupPlace}
+            onChange={(e) => setForm({ ...form, pickupPlace: e.target.value })}
+            className="rounded-lg border border-brown-200 px-3 py-2"
+          />
+          <input
+            placeholder="İade Yeri"
+            value={form.dropoffPlace}
+            onChange={(e) => setForm({ ...form, dropoffPlace: e.target.value })}
+            className="rounded-lg border border-brown-200 px-3 py-2"
+          />
+          <select
+            value={form.status}
+            onChange={(e) => setForm({ ...form, status: e.target.value })}
+            className="rounded-lg border border-brown-200 px-3 py-2"
+          >
+            <option value="confirmed">Onaylandı</option>
+            <option value="pending">Bekliyor</option>
+            <option value="cancelled">İptal</option>
+          </select>
+          <textarea
+            placeholder="Not (opsiyonel)"
+            value={form.notes}
+            onChange={(e) => setForm({ ...form, notes: e.target.value })}
+            className="sm:col-span-2 rounded-lg border border-brown-200 px-3 py-2"
+          />
+          <div className="sm:col-span-2 flex gap-2">
+            <button type="submit" className="rounded-lg bg-brown-500 px-4 py-2 font-semibold text-white hover:bg-brown-600">
+              {editingId ? "Güncelle" : "Rezervasyon Oluştur"}
+            </button>
+            <button
+              type="button"
+              onClick={cancelForm}
+              className="rounded-lg border border-brown-300 px-4 py-2 text-brown-600"
+            >
+              Vazgeç
+            </button>
+          </div>
+        </form>
+      )}
+
       <div className="space-y-4">
         {reservations.map((r) => (
           <div key={r.id} className="rounded-xl border border-brown-200 bg-white p-5">
@@ -101,6 +291,9 @@ export default function AdminRezervasyonlarPage() {
                 className="rounded-lg border border-brown-300 px-3 py-1 text-xs font-semibold text-brown-600"
               >
                 Bekliyor
+              </button>
+              <button onClick={() => startEdit(r)} className="rounded-lg border border-brown-300 px-3 py-1 text-xs font-semibold text-brown-600">
+                Düzenle
               </button>
               <button onClick={() => remove(r.id)} className="ml-auto text-xs text-red-600 hover:underline">
                 Sil
