@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getSiteSettings } from "@/lib/siteSettings";
 
 const links = [
   { href: "/", label: "Anasayfa" },
@@ -8,12 +9,21 @@ const links = [
   { href: "/iletisim", label: "İletişim" },
 ];
 
-export default function Navbar() {
+export default async function Navbar() {
+  const settings = await getSiteSettings();
+
   return (
     <header className="border-b border-brown-200 bg-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="text-xl font-bold text-brown-700">
-          Özkar Grup <span className="text-brown-400">Rent a Car</span>
+        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-brown-700">
+          {settings.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={settings.logoUrl} alt="Özkar Grup Rent a Car" className="h-10 w-auto object-contain" />
+          ) : (
+            <span>
+              Özkar Grup <span className="text-brown-400">Rent a Car</span>
+            </span>
+          )}
         </Link>
         <nav className="hidden gap-6 md:flex">
           {links.map((link) => (

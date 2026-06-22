@@ -49,3 +49,5 @@ next-env.d.ts
 # uploaded files
 /public/uploads/cars/*
 !/public/uploads/cars/.gitkeep
+/public/uploads/logo/*
+!/public/uploads/logo/.gitkeep

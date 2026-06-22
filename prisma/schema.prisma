@@ -66,6 +66,11 @@ model Campaign {
   createdAt   DateTime @default(now())
 }
 
+model SiteSettings {
+  id       String  @id @default("main")
+  logoUrl  String?
+}
+
 model ContactMessage {
   id        String   @id @default(cuid())
   name      String

@@ -1,3 +1,5 @@
+export const revalidate = 0;
+
 export default function HakkimizdaPage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">

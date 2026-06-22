@@ -23,6 +23,8 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
   const file = formData.get("file");
+  const targetRaw = formData.get("target");
+  const target = targetRaw === "logo" ? "logo" : "cars";
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Dosya bulunamadı." }, { status: 400 });
@@ -36,12 +38,12 @@ export async function POST(req: NextRequest) {
 
   const ext = path.extname(file.name) || `.${file.type.split("/")[1]}`;
   const filename = `${randomUUID()}${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "cars");
+  const uploadDir = path.join(process.cwd(), "public", "uploads", target);
   const filePath = path.join(uploadDir, filename);
 
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(filePath, buffer);
   scheduleRestart();
 
-  return NextResponse.json({ url: `/uploads/cars/${filename}` });
+  return NextResponse.json({ url: `/uploads/${target}/${filename}` });
 }
