@@ -24,7 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
       template: "%s",
     },
     description: "Güvenilir ve konforlu araç kiralama hizmeti. Geniş araç filomuzdan size en uygun aracı seçin, online rezervasyon yapın.",
-    icons: settings.faviconUrl ? { icon: settings.faviconUrl } : undefined,
+    icons: settings.faviconUrl
+      ? { icon: `${settings.faviconUrl}?v=${settings.updatedAt.getTime()}` }
+      : undefined,
     openGraph: {
       type: "website",
       locale: "tr_TR",
