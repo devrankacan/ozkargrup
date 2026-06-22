@@ -26,7 +26,7 @@ export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
     if (endDate) params.set("endDate", endDate);
     if (pickupPlace) params.set("pickupPlace", pickupPlace);
 
-    router.push(`/rezervasyon?${params.toString()}`);
+    router.push(`/musaitlik?${params.toString()}`);
   }
 
   return (
@@ -71,6 +71,7 @@ export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
             <input
               name="startDate"
               type="date"
+              required
               className="w-full rounded-lg border border-brown-200 px-3 py-2.5 text-brown-700 outline-none focus:border-brown-400"
             />
           </div>
@@ -81,6 +82,7 @@ export default function QuickBookingWidget({ cars }: { cars: Car[] }) {
             <input
               name="endDate"
               type="date"
+              required
               className="w-full rounded-lg border border-brown-200 px-3 py-2.5 text-brown-700 outline-none focus:border-brown-400"
             />
           </div>
