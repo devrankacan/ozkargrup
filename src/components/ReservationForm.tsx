@@ -12,9 +12,15 @@ type Car = {
 export default function ReservationForm({
   cars,
   defaultCarId,
+  defaultStartDate,
+  defaultEndDate,
+  defaultPickupPlace,
 }: {
   cars: Car[];
   defaultCarId?: string;
+  defaultStartDate?: string;
+  defaultEndDate?: string;
+  defaultPickupPlace?: string;
 }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -115,6 +121,7 @@ export default function ReservationForm({
             name="startDate"
             type="date"
             required
+            defaultValue={defaultStartDate}
             className="w-full rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
           />
         </div>
@@ -124,6 +131,7 @@ export default function ReservationForm({
             name="endDate"
             type="date"
             required
+            defaultValue={defaultEndDate}
             className="w-full rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
           />
         </div>
@@ -134,6 +142,7 @@ export default function ReservationForm({
           name="pickupPlace"
           required
           placeholder="Alış Yeri"
+          defaultValue={defaultPickupPlace}
           className="rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
         />
         <input

@@ -28,6 +28,16 @@ model Car {
   isActive     Boolean       @default(true)
   createdAt    DateTime      @default(now())
   reservations Reservation[]
+  images       CarImage[]
+}
+
+model CarImage {
+  id        String   @id @default(cuid())
+  carId     String
+  car       Car      @relation(fields: [carId], references: [id], onDelete: Cascade)
+  url       String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
 }
 
 model Reservation {

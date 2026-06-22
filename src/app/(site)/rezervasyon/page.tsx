@@ -4,9 +4,9 @@ import ReservationForm from "@/components/ReservationForm";
 export default async function RezervasyonPage({
   searchParams,
 }: {
-  searchParams: Promise<{ carId?: string }>;
+  searchParams: Promise<{ carId?: string; startDate?: string; endDate?: string; pickupPlace?: string }>;
 }) {
-  const { carId } = await searchParams;
+  const { carId, startDate, endDate, pickupPlace } = await searchParams;
   const cars = await prisma.car.findMany({
     where: { isActive: true },
     orderBy: { createdAt: "desc" },
@@ -18,7 +18,13 @@ export default async function RezervasyonPage({
       <p className="mb-8 text-brown-500">
         Aşağıdaki formu doldurarak rezervasyon talebinizi oluşturabilirsiniz.
       </p>
-      <ReservationForm cars={cars} defaultCarId={carId} />
+      <ReservationForm
+        cars={cars}
+        defaultCarId={carId}
+        defaultStartDate={startDate}
+        defaultEndDate={endDate}
+        defaultPickupPlace={pickupPlace}
+      />
     </div>
   );
 }

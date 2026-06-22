@@ -13,6 +13,7 @@ type Car = {
   seats: number;
   description: string | null;
   isActive: boolean;
+  images: { url: string }[];
 };
 
 const emptyForm = {
@@ -24,6 +25,7 @@ const emptyForm = {
   fuelType: "",
   seats: "",
   description: "",
+  imagesText: "",
 };
 
 export default function AdminAraclarPage() {
@@ -46,10 +48,14 @@ export default function AdminAraclarPage() {
     e.preventDefault();
     const url = editingId ? `/api/admin/araclar/${editingId}` : "/api/admin/araclar";
     const method = editingId ? "PATCH" : "POST";
+    const images = form.imagesText
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
     await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, images }),
     });
     setForm(emptyForm);
     setEditingId(null);
@@ -67,6 +73,7 @@ export default function AdminAraclarPage() {
       fuelType: car.fuelType,
       seats: String(car.seats),
       description: car.description || "",
+      imagesText: car.images.map((img) => img.url).join("\n"),
     });
   }
 
@@ -147,6 +154,18 @@ export default function AdminAraclarPage() {
           onChange={(e) => setForm({ ...form, description: e.target.value })}
           className="sm:col-span-2 rounded-lg border border-brown-200 px-3 py-2"
         />
+        <div className="sm:col-span-2">
+          <label className="mb-1 block text-sm font-medium text-brown-700">
+            Görsel URL&apos;leri (her satıra bir görsel linki)
+          </label>
+          <textarea
+            rows={4}
+            placeholder={"https://.../foto1.jpg\nhttps://.../foto2.jpg"}
+            value={form.imagesText}
+            onChange={(e) => setForm({ ...form, imagesText: e.target.value })}
+            className="w-full rounded-lg border border-brown-200 px-3 py-2"
+          />
+        </div>
         <div className="sm:col-span-2 flex gap-2">
           <button type="submit" className="rounded-lg bg-brown-500 px-4 py-2 font-semibold text-white hover:bg-brown-600">
             {editingId ? "Güncelle" : "Araç Ekle"}
@@ -176,6 +195,7 @@ export default function AdminAraclarPage() {
                 <th className="p-3">Araç</th>
                 <th className="p-3">Kategori</th>
                 <th className="p-3">Fiyat</th>
+                <th className="p-3">Görsel</th>
                 <th className="p-3">Durum</th>
                 <th className="p-3">İşlemler</th>
               </tr>
@@ -186,6 +206,7 @@ export default function AdminAraclarPage() {
                   <td className="p-3 text-brown-700">{car.brand} {car.name}</td>
                   <td className="p-3 text-brown-600">{car.category}</td>
                   <td className="p-3 text-brown-600">{car.pricePerDay} ₺</td>
+                  <td className="p-3 text-brown-500">{car.images.length} görsel</td>
                   <td className="p-3">
                     <button
                       onClick={() => toggleActive(car)}

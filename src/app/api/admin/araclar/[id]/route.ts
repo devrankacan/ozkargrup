@@ -8,6 +8,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const body = await req.json();
+
+  if (Array.isArray(body.images)) {
+    await prisma.carImage.deleteMany({ where: { carId: id } });
+    const images: string[] = body.images.filter(Boolean);
+    if (images.length > 0) {
+      await prisma.carImage.createMany({
+        data: images.map((url, i) => ({ carId: id, url, order: i })),
+      });
+    }
+  }
+
   const car = await prisma.car.update({
     where: { id },
     data: {
@@ -22,6 +33,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       description: body.description,
       isActive: body.isActive,
     },
+    include: { images: { orderBy: { order: "asc" } } },
   });
   return NextResponse.json(car);
 }
