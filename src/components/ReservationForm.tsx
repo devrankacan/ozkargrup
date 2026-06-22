@@ -195,7 +195,7 @@ export default function ReservationForm({
         disabled={status === "loading"}
         className="rounded-full bg-brown-500 px-6 py-2 font-semibold text-white transition hover:bg-brown-600 disabled:opacity-60"
       >
-        {status === "loading" ? "Gönderiliyor..." : "Rezervasyon Talebi Gönder (WhatsApp)"}
+        {status === "loading" ? "Gönderiliyor..." : "Rezervasyon Talebi Gönder"}
       </button>
     </form>
   );
