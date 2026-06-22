@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import QuickBookingWidget from "@/components/QuickBookingWidget";
 
+export const revalidate = 0;
+
 export default async function HomePage() {
   const cars = await prisma.car.findMany({
     where: { isActive: true },

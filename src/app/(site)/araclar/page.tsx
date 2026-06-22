@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
+export const revalidate = 0;
+
 export default async function AraclarPage() {
   const cars = await prisma.car.findMany({
     where: { isActive: true },
