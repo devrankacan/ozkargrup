@@ -138,7 +138,12 @@ export default function AdminAraclarPage() {
 
   async function remove(id: string) {
     if (!confirm("Bu aracı silmek istediğinize emin misiniz?")) return;
-    await fetch(`/api/admin/araclar/${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/admin/araclar/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const err = await res.json();
+      alert(err.error || "Araç silinirken bir hata oluştu.");
+      return;
+    }
     load();
   }
 

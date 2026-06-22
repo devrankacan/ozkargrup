@@ -43,6 +43,18 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (error) return error;
 
   const { id } = await params;
-  await prisma.car.delete({ where: { id } });
+
+  try {
+    await prisma.car.delete({ where: { id } });
+  } catch {
+    return NextResponse.json(
+      {
+        error:
+          "Bu araca ait rezervasyon kayıtları olduğu için silinemiyor. Önce \"Pasif Yap\" ile listeden kaldırabilirsiniz.",
+      },
+      { status: 409 }
+    );
+  }
+
   return NextResponse.json({ success: true });
 }
