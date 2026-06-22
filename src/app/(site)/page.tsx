@@ -14,12 +14,6 @@ export default async function HomePage() {
     include: { images: { orderBy: { order: "asc" }, take: 1 } },
   });
 
-  const campaigns = await prisma.campaign.findMany({
-    where: { isActive: true },
-    orderBy: { createdAt: "desc" },
-    take: 2,
-  });
-
   const locations = await prisma.location.findMany({
     where: { isActive: true },
     orderBy: [{ order: "asc" }, { name: "asc" }],
@@ -119,27 +113,6 @@ export default async function HomePage() {
           )}
         </div>
       </section>
-
-      {campaigns.length > 0 && (
-        <section className="bg-brown-50">
-          <div className="mx-auto max-w-6xl px-6 py-16">
-            <h2 className="mb-8 text-2xl font-bold text-brown-700">Kampanyalar</h2>
-            <div className="grid gap-6 sm:grid-cols-2">
-              {campaigns.map((c) => (
-                <div key={c.id} className="rounded-xl border border-brown-200 bg-white p-6 shadow-sm">
-                  <h3 className="font-semibold text-brown-700">{c.title}</h3>
-                  <p className="mt-2 text-sm text-brown-600">{c.description}</p>
-                  {c.discount && (
-                    <span className="mt-3 inline-block rounded-full bg-brown-200 px-3 py-1 text-xs font-semibold text-brown-700">
-                      {c.discount}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       <section className="mx-auto max-w-6xl px-6 py-16">
         <h2 className="mb-8 text-2xl font-bold text-brown-700">Neden Özkar Grup Rent a Car?</h2>
