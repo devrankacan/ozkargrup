@@ -33,6 +33,8 @@ export default function AdminAraclarPage() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   async function load() {
     const res = await fetch("/api/admin/araclar");
@@ -60,6 +62,40 @@ export default function AdminAraclarPage() {
     setForm(emptyForm);
     setEditingId(null);
     load();
+  }
+
+  function imagesList() {
+    return form.imagesText.split("\n").map((s) => s.trim()).filter(Boolean);
+  }
+
+  function setImagesList(urls: string[]) {
+    setForm({ ...form, imagesText: urls.join("\n") });
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    setUploadError("");
+    const uploaded: string[] = [];
+    for (const file of Array.from(files)) {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) {
+        setUploadError(data.error || "Yükleme başarısız oldu.");
+        continue;
+      }
+      uploaded.push(data.url);
+    }
+    setImagesList([...imagesList(), ...uploaded]);
+    setUploading(false);
+    e.target.value = "";
+  }
+
+  function removeImage(url: string) {
+    setImagesList(imagesList().filter((u) => u !== url));
   }
 
   function startEdit(car: Car) {
@@ -155,16 +191,44 @@ export default function AdminAraclarPage() {
           className="sm:col-span-2 rounded-lg border border-brown-200 px-3 py-2"
         />
         <div className="sm:col-span-2">
-          <label className="mb-1 block text-sm font-medium text-brown-700">
-            Görsel URL&apos;leri (her satıra bir görsel linki)
-          </label>
-          <textarea
-            rows={4}
-            placeholder={"https://.../foto1.jpg\nhttps://.../foto2.jpg"}
-            value={form.imagesText}
-            onChange={(e) => setForm({ ...form, imagesText: e.target.value })}
-            className="w-full rounded-lg border border-brown-200 px-3 py-2"
+          <label className="mb-1 block text-sm font-medium text-brown-700">Araç Görselleri</label>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            onChange={handleFileUpload}
+            disabled={uploading}
+            className="block w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
           />
+          {uploading && <p className="mt-1 text-sm text-brown-500">Yükleniyor...</p>}
+          {uploadError && <p className="mt-1 text-sm text-red-600">{uploadError}</p>}
+          {imagesList().length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-3">
+              {imagesList().map((url) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <div key={url} className="relative h-20 w-28 overflow-hidden rounded-lg border border-brown-200">
+                  <img src={url} alt="" className="h-full w-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(url)}
+                    className="absolute right-0 top-0 rounded-bl bg-red-600 px-1.5 py-0.5 text-xs font-bold text-white"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <details className="mt-3">
+            <summary className="cursor-pointer text-sm text-brown-500">Veya görsel URL&apos;si yapıştır</summary>
+            <textarea
+              rows={3}
+              placeholder={"https://.../foto1.jpg\nhttps://.../foto2.jpg"}
+              value={form.imagesText}
+              onChange={(e) => setForm({ ...form, imagesText: e.target.value })}
+              className="mt-2 w-full rounded-lg border border-brown-200 px-3 py-2"
+            />
+          </details>
         </div>
         <div className="sm:col-span-2 flex gap-2">
           <button type="submit" className="rounded-lg bg-brown-500 px-4 py-2 font-semibold text-white hover:bg-brown-600">
