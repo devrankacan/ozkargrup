@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/requireAdmin";
-import { sendReservationConfirmationEmail } from "@/lib/mailer";
-import { getSiteSettings } from "@/lib/siteSettings";
 
 export async function GET() {
   const { error } = await requireAdmin();
@@ -37,18 +35,6 @@ export async function POST(req: NextRequest) {
       status: body.status || "confirmed",
     },
   });
-
-  if (reservation.email) {
-    const settings = await getSiteSettings();
-    sendReservationConfirmationEmail({
-      to: reservation.email,
-      fullName: reservation.fullName,
-      logoUrl: settings.logoUrl,
-      itemLabel: reservation.tourName,
-      dateRangeText: reservation.tourDate.toLocaleDateString("tr-TR"),
-      detailRows: [{ label: "Kişi Sayısı", value: `${reservation.peopleCount} kişi` }],
-    }).catch((err) => console.error("Onay e-postası gönderilemedi:", err));
-  }
 
   return NextResponse.json(reservation, { status: 201 });
 }

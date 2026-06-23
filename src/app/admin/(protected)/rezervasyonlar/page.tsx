@@ -68,6 +68,8 @@ export default function AdminRezervasyonlarPage() {
   const [formError, setFormError] = useState("");
   const [exportFrom, setExportFrom] = useState("");
   const [exportTo, setExportTo] = useState("");
+  const [mailTemplates, setMailTemplates] = useState<Record<string, string>>({});
+  const [sendingMailId, setSendingMailId] = useState<string | null>(null);
 
   async function load() {
     const [resR, resC, resL] = await Promise.all([
@@ -151,6 +153,23 @@ export default function AdminRezervasyonlarPage() {
     if (!confirm("Bu rezervasyonu silmek istediğinize emin misiniz?")) return;
     await fetch(`/api/admin/rezervasyonlar/${id}`, { method: "DELETE" });
     load();
+  }
+
+  async function sendMail(id: string) {
+    setSendingMailId(id);
+    const template = mailTemplates[id] || "confirmed";
+    const res = await fetch(`/api/admin/rezervasyonlar/${id}/send-mail`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ template }),
+    });
+    setSendingMailId(null);
+    if (!res.ok) {
+      const err = await res.json();
+      alert(err.error || "Mail gönderilemedi.");
+      return;
+    }
+    alert("Mail gönderildi.");
   }
 
   function downloadExcel() {
@@ -360,6 +379,24 @@ export default function AdminRezervasyonlarPage() {
               </button>
               <button onClick={() => remove(r.id)} className="ml-auto text-xs text-red-600 hover:underline">
                 Sil
+              </button>
+            </div>
+            <div className="mt-3 flex items-center gap-2 border-t border-brown-100 pt-3">
+              <select
+                value={mailTemplates[r.id] || "confirmed"}
+                onChange={(e) => setMailTemplates({ ...mailTemplates, [r.id]: e.target.value })}
+                className="rounded-lg border border-brown-200 px-2 py-1 text-xs"
+              >
+                <option value="confirmed">Rezervasyonunuz Onaylandı</option>
+                <option value="reminder">Hatırlatma (1 Gün Kaldı)</option>
+                <option value="completed">Teşekkür / Tamamlandı</option>
+              </select>
+              <button
+                onClick={() => sendMail(r.id)}
+                disabled={sendingMailId === r.id}
+                className="rounded-lg bg-brown-500 px-3 py-1 text-xs font-semibold text-white hover:bg-brown-600 disabled:opacity-50"
+              >
+                {sendingMailId === r.id ? "Gönderiliyor..." : "Mail Gönder"}
               </button>
             </div>
           </div>

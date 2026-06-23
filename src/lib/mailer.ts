@@ -1,6 +1,8 @@
 import nodemailer from "nodemailer";
 import { SITE_URL } from "@/lib/site";
 
+export type EmailTemplate = "confirmed" | "reminder" | "completed";
+
 function getTransporter() {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) return null;
@@ -18,23 +20,52 @@ function absoluteUrl(url?: string | null) {
   return url.startsWith("http") ? url : `${SITE_URL}${url}`;
 }
 
-type ReservationConfirmationInput = {
+const templateContent: Record<
+  EmailTemplate,
+  { subject: (itemLabel: string) => string; icon: string; title: string; body: (fullName: string, itemLabel: string) => string }
+> = {
+  confirmed: {
+    subject: (itemLabel) => `Rezervasyonunuz Onaylandı - ${itemLabel}`,
+    icon: "https://cdn-icons-png.flaticon.com/512/845/845646.png",
+    title: "Rezervasyonunuz Onaylandı",
+    body: (fullName, itemLabel) =>
+      `Sayın ${fullName}, ${itemLabel} için rezervasyonunuz onaylanmıştır. Aşağıda rezervasyon detaylarınızı bulabilirsiniz.`,
+  },
+  reminder: {
+    subject: (itemLabel) => `Hatırlatma - ${itemLabel} Yaklaşıyor`,
+    icon: "https://cdn-icons-png.flaticon.com/512/2838/2838779.png",
+    title: "Rezervasyonunuza 1 Gün Kaldı",
+    body: (fullName, itemLabel) =>
+      `Sayın ${fullName}, ${itemLabel} rezervasyonunuzun başlangıcına 1 gün kaldı. Sizi aramızda görmekten mutluluk duyacağız.`,
+  },
+  completed: {
+    subject: (itemLabel) => `Teşekkür Ederiz - ${itemLabel}`,
+    icon: "https://cdn-icons-png.flaticon.com/512/411/411736.png",
+    title: "Bizi Tercih Ettiğiniz İçin Teşekkür Ederiz",
+    body: (fullName, itemLabel) =>
+      `Sayın ${fullName}, ${itemLabel} sona ermiştir. Bizi tercih ettiğiniz için teşekkür ederiz. Şikayet ve önerilerinizi bize iletebilirsiniz.`,
+  },
+};
+
+type ReservationEmailInput = {
   to: string;
   fullName: string;
   logoUrl?: string | null;
   itemLabel: string;
   dateRangeText: string;
   detailRows: { label: string; value: string }[];
+  template: EmailTemplate;
 };
 
-export async function sendReservationConfirmationEmail(input: ReservationConfirmationInput) {
+export async function sendReservationEmail(input: ReservationEmailInput) {
   const transporter = getTransporter();
   if (!transporter) {
-    console.warn("SMTP yapılandırılmamış, onay e-postası gönderilmedi.");
+    console.warn("SMTP yapılandırılmamış, e-posta gönderilmedi.");
     return;
   }
 
   const logo = absoluteUrl(input.logoUrl);
+  const content = templateContent[input.template];
 
   const detailRowsHtml = input.detailRows
     .map(
@@ -56,11 +87,11 @@ export async function sendReservationConfirmationEmail(input: ReservationConfirm
         <table style="width:100%;margin-bottom:20px;" cellpadding="0" cellspacing="0">
           <tr>
             <td style="vertical-align:top;width:40px;">
-              <img src="https://cdn-icons-png.flaticon.com/512/845/845646.png" width="28" height="28" alt="" />
+              <img src="${content.icon}" width="28" height="28" alt="" />
             </td>
             <td>
-              <h1 style="margin:0;font-size:20px;color:#3e2723;">Rezervasyonunuz Oluşturuldu</h1>
-              <p style="margin:6px 0 0;font-size:14px;color:#6d4c41;">Sayın ${input.fullName}, ${input.itemLabel} için rezervasyonunuz başarıyla alınmıştır.</p>
+              <h1 style="margin:0;font-size:20px;color:#3e2723;">${content.title}</h1>
+              <p style="margin:6px 0 0;font-size:14px;color:#6d4c41;">${content.body(input.fullName, input.itemLabel)}</p>
             </td>
           </tr>
         </table>
@@ -97,7 +128,7 @@ export async function sendReservationConfirmationEmail(input: ReservationConfirm
   await transporter.sendMail({
     from: process.env.SMTP_FROM || `"Özkar Grup Rent a Car" <${process.env.SMTP_USER}>`,
     to: input.to,
-    subject: `Rezervasyonunuz Oluşturuldu - ${input.itemLabel}`,
+    subject: content.subject(input.itemLabel),
     html,
   });
 }
