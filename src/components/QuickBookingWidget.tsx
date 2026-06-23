@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import RippleButton from "@/components/animations/RippleButton";
 
 type Car = {
   id: string;
@@ -99,12 +100,12 @@ export default function QuickBookingWidget({ cars, locations }: { cars: Car[]; l
           </div>
         </div>
 
-        <button
+        <RippleButton
           type="submit"
           className="w-full rounded-full bg-brown-500 px-6 py-3 font-semibold text-white transition hover:bg-brown-600"
         >
           Müsaitlik Sorgula
-        </button>
+        </RippleButton>
       </form>
     </div>
   );

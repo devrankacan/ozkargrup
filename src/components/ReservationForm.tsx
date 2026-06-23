@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import RippleButton from "@/components/animations/RippleButton";
 
 const WHATSAPP_NUMBER = "905419121461";
 
@@ -265,13 +266,13 @@ export default function ReservationForm({
       {dateError && <p className="text-sm text-red-600">{dateError}</p>}
       {errorMsg && <p className="text-sm text-red-600">{errorMsg}</p>}
 
-      <button
+      <RippleButton
         type="submit"
         disabled={status === "loading" || !!dateError}
         className="rounded-full bg-brown-500 px-6 py-2 font-semibold text-white transition hover:bg-brown-600 disabled:opacity-60"
       >
         {status === "loading" ? "Gönderiliyor..." : "Rezervasyon Talebi Gönder"}
-      </button>
+      </RippleButton>
     </form>
   );
 }

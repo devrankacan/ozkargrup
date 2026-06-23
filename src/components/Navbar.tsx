@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSiteSettings } from "@/lib/siteSettings";
 import MobileMenu from "@/components/MobileMenu";
+import MagneticButton from "@/components/animations/MagneticButton";
 
 const links = [
   { href: "/", label: "Anasayfa" },
@@ -39,12 +40,14 @@ export default async function Navbar() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <Link
-            href="/rezervasyon"
-            className="whitespace-nowrap rounded-full bg-brown-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brown-600 sm:px-5 sm:text-sm"
-          >
-            Rezervasyon Yap
-          </Link>
+          <MagneticButton>
+            <Link
+              href="/rezervasyon"
+              className="whitespace-nowrap rounded-full bg-brown-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brown-600 sm:px-5 sm:text-sm"
+            >
+              Rezervasyon Yap
+            </Link>
+          </MagneticButton>
           <MobileMenu links={links} />
         </div>
       </div>

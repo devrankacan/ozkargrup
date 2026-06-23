@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import RippleButton from "@/components/animations/RippleButton";
 
 export default function NewsletterForm() {
   const [email, setEmail] = useState("");
@@ -47,13 +48,13 @@ export default function NewsletterForm() {
           onChange={(e) => setEmail(e.target.value)}
           className="w-full rounded-lg border border-brown-200 bg-white px-3 py-2 text-sm outline-none focus:border-brown-400"
         />
-        <button
+        <RippleButton
           type="submit"
           disabled={status === "loading"}
           className="shrink-0 rounded-lg bg-brown-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brown-600 disabled:opacity-60"
         >
           {status === "loading" ? "..." : "Kaydol"}
-        </button>
+        </RippleButton>
       </div>
       {errorMsg && <p className="text-xs text-red-600">{errorMsg}</p>}
     </form>

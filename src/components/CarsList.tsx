@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import RevealOnScroll from "@/components/animations/RevealOnScroll";
 
 type Car = {
   id: string;
@@ -83,40 +84,41 @@ export default function CarsList({ cars }: { cars: Car[] }) {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((car) => {
+        {filtered.map((car, index) => {
           const thumb = car.images[0]?.url || car.imageUrl;
           return (
-            <Link
-              key={car.id}
-              href={`/araclar/${car.id}`}
-              className="block overflow-hidden rounded-xl border border-brown-200 bg-white shadow-sm transition hover:shadow-md"
-            >
-              <div className="flex h-40 items-center justify-center overflow-hidden bg-brown-100 text-brown-400">
-                {thumb ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={thumb} alt={`${car.brand} ${car.name}`} className="h-full w-full object-cover" />
-                ) : (
-                  <span>{car.brand} {car.name}</span>
-                )}
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-brown-700">
-                  {car.brand} {car.name}
-                </h3>
-                <p className="text-sm text-brown-500">{car.category}</p>
-                <ul className="mt-2 space-y-1 text-sm text-brown-500">
-                  <li>Vites: {car.transmission}</li>
-                  <li>Yakıt: {car.fuelType}</li>
-                  <li>Koltuk: {car.seats}</li>
-                </ul>
-                <p className="mt-3 text-lg font-bold text-brown-600">
-                  {car.pricePerDay} ₺ <span className="text-sm font-normal">/ gün</span>
-                </p>
-                <span className="mt-3 inline-block w-full rounded-lg bg-brown-500 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brown-600">
-                  Detayları Gör
-                </span>
-              </div>
-            </Link>
+            <RevealOnScroll key={car.id} index={index}>
+              <Link
+                href={`/araclar/${car.id}`}
+                className="block overflow-hidden rounded-xl border border-brown-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl"
+              >
+                <div className="flex h-40 items-center justify-center overflow-hidden bg-brown-100 text-brown-400">
+                  {thumb ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={thumb} alt={`${car.brand} ${car.name}`} className="h-full w-full object-cover" />
+                  ) : (
+                    <span>{car.brand} {car.name}</span>
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-brown-700">
+                    {car.brand} {car.name}
+                  </h3>
+                  <p className="text-sm text-brown-500">{car.category}</p>
+                  <ul className="mt-2 space-y-1 text-sm text-brown-500">
+                    <li>Vites: {car.transmission}</li>
+                    <li>Yakıt: {car.fuelType}</li>
+                    <li>Koltuk: {car.seats}</li>
+                  </ul>
+                  <p className="mt-3 text-lg font-bold text-brown-600">
+                    {car.pricePerDay} ₺ <span className="text-sm font-normal">/ gün</span>
+                  </p>
+                  <span className="mt-3 inline-block w-full rounded-lg bg-brown-500 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brown-600">
+                    Detayları Gör
+                  </span>
+                </div>
+              </Link>
+            </RevealOnScroll>
           );
         })}
         {filtered.length === 0 && <p className="text-brown-500">Bu kriterlere uygun araç bulunamadı.</p>}

@@ -3,6 +3,11 @@ import { prisma } from "@/lib/prisma";
 import QuickBookingWidget from "@/components/QuickBookingWidget";
 import { getSiteSettings } from "@/lib/siteSettings";
 import { tours } from "@/lib/tours";
+import AnimatedHeading from "@/components/animations/AnimatedHeading";
+import RevealOnScroll from "@/components/animations/RevealOnScroll";
+import AnimatedCounter from "@/components/animations/AnimatedCounter";
+import MagneticButton from "@/components/animations/MagneticButton";
+import ThreeHeroBackground from "@/components/animations/ThreeHeroBackground";
 
 export const revalidate = 0;
 
@@ -15,15 +20,20 @@ export default async function HomePage() {
     include: { images: { orderBy: { order: "asc" }, take: 1 } },
   });
 
+  const totalCarCount = await prisma.car.count({ where: { isActive: true } });
+
   const locations = await prisma.location.findMany({
     where: { isActive: true },
     orderBy: [{ order: "asc" }, { name: "asc" }],
   });
 
+  const hasHeroImage = Boolean(settings.heroImageDesktopUrl || settings.heroImageMobileUrl);
+
   return (
     <div>
       <section className="relative overflow-hidden bg-brown-50">
-        {(settings.heroImageDesktopUrl || settings.heroImageMobileUrl) && (
+        {!hasHeroImage && <ThreeHeroBackground />}
+        {hasHeroImage && (
           <>
             {settings.heroImageMobileUrl && (
               // eslint-disable-next-line @next/next/no-img-element
@@ -70,43 +80,60 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-6xl px-6 py-12">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: "Araç", value: totalCarCount || 0, suffix: "+" },
+            { label: "Mutlu Müşteri", value: 1200, suffix: "+" },
+            { label: "Yıllık Deneyim", value: 8, suffix: "" },
+            { label: "Lokasyon", value: locations.length || 0, suffix: "+" },
+          ].map((stat) => (
+            <div key={stat.label} className="rounded-xl border border-brown-200 bg-white p-6 text-center shadow-sm">
+              <AnimatedCounter value={stat.value} suffix={stat.suffix} className="text-3xl font-bold text-brown-700" />
+              <p className="mt-2 text-sm text-brown-500">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mb-8 flex items-end justify-between">
-          <h2 className="text-2xl font-bold text-brown-700">Öne Çıkan Araçlar</h2>
+          <AnimatedHeading className="text-2xl font-bold text-brown-700">Öne Çıkan Araçlar</AnimatedHeading>
           <Link href="/araclar" className="text-sm font-medium text-brown-500 hover:text-brown-700">
             Tüm araçları gör →
           </Link>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {cars.map((car) => {
+          {cars.map((car, index) => {
             const thumb = car.images[0]?.url || car.imageUrl;
             return (
-              <Link
-                key={car.id}
-                href={`/araclar/${car.id}`}
-                className="block overflow-hidden rounded-xl border border-brown-200 bg-white shadow-sm transition hover:shadow-md"
-              >
-                <div className="flex h-40 items-center justify-center overflow-hidden bg-brown-100 text-brown-400">
-                  {thumb ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={thumb} alt={`${car.brand} ${car.name}`} className="h-full w-full object-cover" />
-                  ) : (
-                    <span>{car.brand} {car.name}</span>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-brown-700">
-                    {car.brand} {car.name}
-                  </h3>
-                  <p className="text-sm text-brown-500">{car.category}</p>
-                  <p className="mt-2 text-lg font-bold text-brown-600">
-                    {car.pricePerDay} ₺ <span className="text-sm font-normal">/ gün</span>
-                  </p>
-                  <span className="mt-3 inline-block w-full rounded-lg bg-brown-500 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brown-600">
-                    Detayları Gör
-                  </span>
-                </div>
-              </Link>
+              <RevealOnScroll key={car.id} index={index}>
+                <Link
+                  href={`/araclar/${car.id}`}
+                  className="block overflow-hidden rounded-xl border border-brown-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl"
+                >
+                  <div className="flex h-40 items-center justify-center overflow-hidden bg-brown-100 text-brown-400">
+                    {thumb ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={thumb} alt={`${car.brand} ${car.name}`} className="h-full w-full object-cover" />
+                    ) : (
+                      <span>{car.brand} {car.name}</span>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-brown-700">
+                      {car.brand} {car.name}
+                    </h3>
+                    <p className="text-sm text-brown-500">{car.category}</p>
+                    <p className="mt-2 text-lg font-bold text-brown-600">
+                      {car.pricePerDay} ₺ <span className="text-sm font-normal">/ gün</span>
+                    </p>
+                    <span className="mt-3 inline-block w-full rounded-lg bg-brown-500 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-brown-600">
+                      Detayları Gör
+                    </span>
+                  </div>
+                </Link>
+              </RevealOnScroll>
             );
           })}
           {cars.length === 0 && (
@@ -117,51 +144,54 @@ export default async function HomePage() {
 
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mb-8 flex items-end justify-between">
-          <h2 className="text-2xl font-bold text-brown-700">Turlarımız</h2>
+          <AnimatedHeading className="text-2xl font-bold text-brown-700">Turlarımız</AnimatedHeading>
           <Link href="/turlar" className="text-sm font-medium text-brown-500 hover:text-brown-700">
             Tüm turları gör →
           </Link>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {tours.map((tour) => (
-            <Link
-              key={tour.slug}
-              href={`/turlar/${tour.slug}`}
-              className="block overflow-hidden rounded-xl border border-brown-200 bg-white shadow-sm transition hover:shadow-md"
-            >
-              <div className="h-40 w-full overflow-hidden bg-brown-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={tour.imageUrl} alt={tour.name} className="h-full w-full object-cover" />
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-brown-700">{tour.name}</h3>
-                <p className="text-sm text-brown-500">{tour.location}</p>
-              </div>
-            </Link>
+          {tours.map((tour, index) => (
+            <RevealOnScroll key={tour.slug} index={index}>
+              <Link
+                href={`/turlar/${tour.slug}`}
+                className="block overflow-hidden rounded-xl border border-brown-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl"
+              >
+                <div className="h-40 w-full overflow-hidden bg-brown-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={tour.imageUrl} alt={tour.name} className="h-full w-full object-cover" />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-brown-700">{tour.name}</h3>
+                  <p className="text-sm text-brown-500">{tour.location}</p>
+                </div>
+              </Link>
+            </RevealOnScroll>
           ))}
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-16">
-        <h2 className="mb-8 text-2xl font-bold text-brown-700">Neden Özkar Grup Rent a Car?</h2>
+        <AnimatedHeading className="mb-8 text-2xl font-bold text-brown-700">Neden Özkar Grup Rent a Car?</AnimatedHeading>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { title: "Geniş Araç Filosu", desc: "Her ihtiyaca uygun, bakımlı ve güncel araç seçenekleri." },
             { title: "Şeffaf Fiyatlandırma", desc: "Sürpriz ücret yok, gördüğünüz fiyat ödeyeceğiniz fiyattır." },
             { title: "Hızlı Rezervasyon", desc: "Online formla dakikalar içinde rezervasyon talebi oluşturun." },
             { title: "7/24 Destek", desc: "WhatsApp ve telefon hattımızdan her an yanınızdayız." },
-          ].map((item) => (
-            <div key={item.title} className="rounded-xl border border-brown-200 bg-white p-6 shadow-sm">
-              <h3 className="font-semibold text-brown-700">{item.title}</h3>
-              <p className="mt-2 text-sm text-brown-500">{item.desc}</p>
-            </div>
+          ].map((item, index) => (
+            <RevealOnScroll key={item.title} index={index}>
+              <div className="h-full rounded-xl border border-brown-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <h3 className="font-semibold text-brown-700">{item.title}</h3>
+                <p className="mt-2 text-sm text-brown-500">{item.desc}</p>
+              </div>
+            </RevealOnScroll>
           ))}
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="mb-8 flex items-end justify-between">
-          <h2 className="text-2xl font-bold text-brown-700">Sıkça Sorulan Sorular</h2>
+          <AnimatedHeading className="text-2xl font-bold text-brown-700">Sıkça Sorulan Sorular</AnimatedHeading>
           <Link href="/sss" className="text-sm font-medium text-brown-500 hover:text-brown-700">
             Tüm soruları gör →
           </Link>
@@ -197,7 +227,7 @@ export default async function HomePage() {
       {locations.length > 0 && (
         <section className="bg-brown-50">
           <div className="mx-auto max-w-6xl px-6 py-16">
-            <h2 className="mb-2 text-2xl font-bold text-brown-700">Alış / İade Lokasyonlarımız</h2>
+            <AnimatedHeading className="mb-2 text-2xl font-bold text-brown-700">Alış / İade Lokasyonlarımız</AnimatedHeading>
             <p className="mb-8 text-sm text-brown-500">
               Aşağıdaki noktalardan aracınızı teslim alabilir, dilediğiniz lokasyona iade edebilirsiniz.
             </p>
@@ -223,12 +253,14 @@ export default async function HomePage() {
               Ehliyet, depozito, sigorta ve yakıt politikamız hakkında bilgi alın.
             </p>
           </div>
-          <Link
-            href="/kiralama-sartlari"
-            className="shrink-0 rounded-full bg-white px-6 py-2 font-semibold text-brown-700 transition hover:bg-brown-50"
-          >
-            Kiralama Şartları
-          </Link>
+          <MagneticButton>
+            <Link
+              href="/kiralama-sartlari"
+              className="shrink-0 rounded-full bg-white px-6 py-2 font-semibold text-brown-700 transition hover:bg-brown-50"
+            >
+              Kiralama Şartları
+            </Link>
+          </MagneticButton>
         </div>
       </section>
     </div>

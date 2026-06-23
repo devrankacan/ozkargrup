@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import RippleButton from "@/components/animations/RippleButton";
 
 export default function ContactForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -84,13 +85,13 @@ export default function ContactForm() {
         className="w-full rounded-lg border border-brown-200 px-4 py-2 outline-none focus:border-brown-400"
       />
       {errorMsg && <p className="text-sm text-red-600">{errorMsg}</p>}
-      <button
+      <RippleButton
         type="submit"
         disabled={status === "loading"}
         className="rounded-full bg-brown-500 px-6 py-2 font-semibold text-white transition hover:bg-brown-600 disabled:opacity-60"
       >
         {status === "loading" ? "Gönderiliyor..." : "Gönder"}
-      </button>
+      </RippleButton>
     </form>
   );
 }
