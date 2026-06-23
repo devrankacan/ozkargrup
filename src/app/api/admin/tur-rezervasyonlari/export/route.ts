@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import * as XLSX from "xlsx";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { buildCorporateWorkbook } from "@/lib/excel";
 
 const statusLabels: Record<string, string> = {
   pending: "Bekliyor",
@@ -28,21 +28,31 @@ export async function GET(req: NextRequest) {
     orderBy: { event: { eventDate: "asc" } },
   });
 
-  const rows = reservations.map((r) => ({
-    "Ad Soyad": r.fullName,
-    "Telefon": r.phone,
-    "E-posta": r.email || "",
-    "Tur": r.event.tourName,
-    "Tur Tarihi": r.event.eventDate.toLocaleDateString("tr-TR"),
-    "Kişi Sayısı": r.peopleCount,
-    "Durum": statusLabels[r.status] || r.status,
-    "Not": r.notes || "",
-  }));
-
-  const worksheet = XLSX.utils.json_to_sheet(rows);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Tur Rezervasyonları");
-  const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+  const buffer = await buildCorporateWorkbook({
+    sheetName: "Tur Rezervasyonları",
+    title: "Tur Rezervasyonları",
+    subtitle: from || to ? `${from || "Başlangıç"} - ${to || "Bugün"}` : undefined,
+    columns: [
+      { header: "Ad Soyad", width: 24 },
+      { header: "Telefon", width: 16 },
+      { header: "E-posta", width: 26 },
+      { header: "Tur", width: 24 },
+      { header: "Tur Tarihi", width: 14 },
+      { header: "Kişi Sayısı", width: 12 },
+      { header: "Durum", width: 14 },
+      { header: "Not", width: 30 },
+    ],
+    rows: reservations.map((r) => [
+      r.fullName,
+      r.phone,
+      r.email || "",
+      r.event.tourName,
+      r.event.eventDate.toLocaleDateString("tr-TR"),
+      r.peopleCount,
+      statusLabels[r.status] || r.status,
+      r.notes || "",
+    ]),
+  });
 
   return new NextResponse(buffer, {
     headers: {
