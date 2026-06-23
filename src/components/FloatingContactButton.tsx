@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-const WHATSAPP_NUMBER = "905616179731";
-const PHONE_NUMBER = "+905616179731";
+const WHATSAPP_NUMBER = "905309105461";
+const PHONE_NUMBER = "+905309105461";
 
 export default function FloatingContactButton() {
   const [open, setOpen] = useState(false);

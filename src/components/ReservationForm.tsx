@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const WHATSAPP_NUMBER = "905616179731";
+const WHATSAPP_NUMBER = "905309105461";
 
 type Car = {
   id: string;

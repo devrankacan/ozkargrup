@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { tours } from "@/lib/tours";
 
+const WHATSAPP_NUMBER = "905309105461";
+
 export function generateStaticParams() {
   return tours.map((tour) => ({ slug: tour.slug }));
 }
@@ -30,6 +32,11 @@ export default async function TourDetailPage({
   const tour = tours.find((t) => t.slug === slug);
   if (!tour) notFound();
 
+  const message = encodeURIComponent(
+    `Merhaba, ${tour.name} turu hakkında bilgi almak istiyorum.`
+  );
+  const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">
       <Link href="/turlar" className="text-sm font-medium text-brown-500 hover:text-brown-700">
@@ -44,12 +51,14 @@ export default async function TourDetailPage({
           <h1 className="text-3xl font-bold text-brown-700">{tour.name}</h1>
           <p className="mt-1 text-sm font-medium text-brown-400">{tour.location}</p>
           <p className="mt-6 text-brown-600">{tour.description}</p>
-          <Link
-            href="/iletisim"
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-8 inline-block rounded-lg bg-brown-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brown-600"
           >
             Tur Hakkında Bilgi Al
-          </Link>
+          </a>
         </div>
       </div>
     </div>
