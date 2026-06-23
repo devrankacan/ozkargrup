@@ -174,7 +174,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="h-px bg-brown-200" />
+      </div>
+
+      <section className="mx-auto max-w-6xl px-6 py-10">
         <AnimatedHeading className="mb-8 text-2xl font-bold text-brown-700">Neden Özkar Grup Rent a Car?</AnimatedHeading>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[
@@ -193,7 +197,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="h-px bg-brown-200" />
+      </div>
+
+      <section className="mx-auto max-w-6xl px-6 py-10">
         <div className="mb-8 flex items-end justify-between">
           <AnimatedHeading className="text-2xl font-bold text-brown-700">Sıkça Sorulan Sorular</AnimatedHeading>
           <Link href="/sss" className="text-sm font-medium text-brown-500 hover:text-brown-700">
@@ -230,7 +238,7 @@ export default async function HomePage() {
 
       {locations.length > 0 && (
         <section className="bg-brown-50">
-          <div className="mx-auto max-w-6xl px-6 py-16">
+          <div className="mx-auto max-w-6xl px-6 py-12">
             <AnimatedHeading className="mb-2 text-2xl font-bold text-brown-700">Alış / İade Lokasyonlarımız</AnimatedHeading>
             <p className="mb-8 text-sm text-brown-500">
               Aşağıdaki noktalardan aracınızı teslim alabilir, dilediğiniz lokasyona iade edebilirsiniz.
