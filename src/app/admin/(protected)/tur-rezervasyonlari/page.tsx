@@ -55,6 +55,11 @@ export default function AdminTurRezervasyonlariPage() {
   const [exportTo, setExportTo] = useState("");
   const [mailTemplates, setMailTemplates] = useState<Record<string, string>>({});
   const [sendingMailId, setSendingMailId] = useState<string | null>(null);
+  const [draftSearch, setDraftSearch] = useState("");
+  const [draftStatus, setDraftStatus] = useState("");
+  const [draftEventId, setDraftEventId] = useState("");
+  const [draftFrom, setDraftFrom] = useState("");
+  const [draftTo, setDraftTo] = useState("");
   const [filterSearch, setFilterSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterEventId, setFilterEventId] = useState("");
@@ -168,7 +173,21 @@ export default function AdminTurRezervasyonlariPage() {
     window.open(`/api/admin/tur-rezervasyonlari/export?${params.toString()}`, "_blank");
   }
 
+  function applyFilters(e: React.FormEvent) {
+    e.preventDefault();
+    setFilterSearch(draftSearch);
+    setFilterStatus(draftStatus);
+    setFilterEventId(draftEventId);
+    setFilterFrom(draftFrom);
+    setFilterTo(draftTo);
+  }
+
   function clearFilters() {
+    setDraftSearch("");
+    setDraftStatus("");
+    setDraftEventId("");
+    setDraftFrom("");
+    setDraftTo("");
     setFilterSearch("");
     setFilterStatus("");
     setFilterEventId("");
@@ -235,11 +254,11 @@ export default function AdminTurRezervasyonlariPage() {
         </p>
       )}
 
-      <div className="mb-6 rounded-xl border border-brown-200 bg-white p-5">
+      <form onSubmit={applyFilters} className="mb-6 rounded-xl border border-brown-200 bg-white p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-brown-700">Filtrele</h2>
           {filtersActive && (
-            <button onClick={clearFilters} className="text-xs text-brown-500 hover:underline">
+            <button type="button" onClick={clearFilters} className="text-xs text-brown-500 hover:underline">
               Filtreleri Temizle
             </button>
           )}
@@ -247,13 +266,13 @@ export default function AdminTurRezervasyonlariPage() {
         <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
           <input
             placeholder="Ad, telefon, e-posta veya tur ara..."
-            value={filterSearch}
-            onChange={(e) => setFilterSearch(e.target.value)}
+            value={draftSearch}
+            onChange={(e) => setDraftSearch(e.target.value)}
             className="rounded-lg border border-brown-200 px-3 py-2 text-sm sm:col-span-2 lg:col-span-2"
           />
           <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            value={draftStatus}
+            onChange={(e) => setDraftStatus(e.target.value)}
             className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
           >
             <option value="">Tüm Durumlar</option>
@@ -262,8 +281,8 @@ export default function AdminTurRezervasyonlariPage() {
             <option value="cancelled">İptal</option>
           </select>
           <select
-            value={filterEventId}
-            onChange={(e) => setFilterEventId(e.target.value)}
+            value={draftEventId}
+            onChange={(e) => setDraftEventId(e.target.value)}
             className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
           >
             <option value="">Tüm Etkinlikler</option>
@@ -277,23 +296,31 @@ export default function AdminTurRezervasyonlariPage() {
             <label className="text-sm text-brown-500 whitespace-nowrap">Tarih Aralığı:</label>
             <input
               type="date"
-              value={filterFrom}
-              onChange={(e) => setFilterFrom(e.target.value)}
+              value={draftFrom}
+              onChange={(e) => setDraftFrom(e.target.value)}
               className="w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
             />
             <span className="text-brown-400">—</span>
             <input
               type="date"
-              value={filterTo}
-              onChange={(e) => setFilterTo(e.target.value)}
+              value={draftTo}
+              onChange={(e) => setDraftTo(e.target.value)}
               className="w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
             />
           </div>
         </div>
-        <p className="mt-3 text-xs text-brown-500">
-          {filteredReservations.length} / {reservations.length} rezervasyon gösteriliyor.
-        </p>
-      </div>
+        <div className="mt-4 flex items-center justify-between">
+          <button
+            type="submit"
+            className="rounded-lg bg-brown-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brown-600"
+          >
+            Ara
+          </button>
+          <p className="text-xs text-brown-500">
+            {filteredReservations.length} / {reservations.length} rezervasyon gösteriliyor.
+          </p>
+        </div>
+      </form>
 
       {showForm && (
         <form

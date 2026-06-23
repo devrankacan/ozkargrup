@@ -70,6 +70,13 @@ export default function AdminRezervasyonlarPage() {
   const [exportTo, setExportTo] = useState("");
   const [mailTemplates, setMailTemplates] = useState<Record<string, string>>({});
   const [sendingMailId, setSendingMailId] = useState<string | null>(null);
+  const [draftSearch, setDraftSearch] = useState("");
+  const [draftStatus, setDraftStatus] = useState("");
+  const [draftCarId, setDraftCarId] = useState("");
+  const [draftPickup, setDraftPickup] = useState("");
+  const [draftDropoff, setDraftDropoff] = useState("");
+  const [draftFrom, setDraftFrom] = useState("");
+  const [draftTo, setDraftTo] = useState("");
   const [filterSearch, setFilterSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterCarId, setFilterCarId] = useState("");
@@ -186,7 +193,25 @@ export default function AdminRezervasyonlarPage() {
     window.open(`/api/admin/rezervasyonlar/export?${params.toString()}`, "_blank");
   }
 
+  function applyFilters(e: React.FormEvent) {
+    e.preventDefault();
+    setFilterSearch(draftSearch);
+    setFilterStatus(draftStatus);
+    setFilterCarId(draftCarId);
+    setFilterPickup(draftPickup);
+    setFilterDropoff(draftDropoff);
+    setFilterFrom(draftFrom);
+    setFilterTo(draftTo);
+  }
+
   function clearFilters() {
+    setDraftSearch("");
+    setDraftStatus("");
+    setDraftCarId("");
+    setDraftPickup("");
+    setDraftDropoff("");
+    setDraftFrom("");
+    setDraftTo("");
     setFilterSearch("");
     setFilterStatus("");
     setFilterCarId("");
@@ -251,11 +276,11 @@ export default function AdminRezervasyonlarPage() {
         </div>
       </div>
 
-      <div className="mb-6 rounded-xl border border-brown-200 bg-white p-5">
+      <form onSubmit={applyFilters} className="mb-6 rounded-xl border border-brown-200 bg-white p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-brown-700">Filtrele</h2>
           {filtersActive && (
-            <button onClick={clearFilters} className="text-xs text-brown-500 hover:underline">
+            <button type="button" onClick={clearFilters} className="text-xs text-brown-500 hover:underline">
               Filtreleri Temizle
             </button>
           )}
@@ -263,13 +288,13 @@ export default function AdminRezervasyonlarPage() {
         <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
           <input
             placeholder="Ad, telefon, e-posta veya araç ara..."
-            value={filterSearch}
-            onChange={(e) => setFilterSearch(e.target.value)}
+            value={draftSearch}
+            onChange={(e) => setDraftSearch(e.target.value)}
             className="rounded-lg border border-brown-200 px-3 py-2 text-sm sm:col-span-2 lg:col-span-2"
           />
           <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            value={draftStatus}
+            onChange={(e) => setDraftStatus(e.target.value)}
             className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
           >
             <option value="">Tüm Durumlar</option>
@@ -278,8 +303,8 @@ export default function AdminRezervasyonlarPage() {
             <option value="cancelled">İptal</option>
           </select>
           <select
-            value={filterCarId}
-            onChange={(e) => setFilterCarId(e.target.value)}
+            value={draftCarId}
+            onChange={(e) => setDraftCarId(e.target.value)}
             className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
           >
             <option value="">Tüm Araçlar</option>
@@ -290,8 +315,8 @@ export default function AdminRezervasyonlarPage() {
             ))}
           </select>
           <select
-            value={filterPickup}
-            onChange={(e) => setFilterPickup(e.target.value)}
+            value={draftPickup}
+            onChange={(e) => setDraftPickup(e.target.value)}
             className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
           >
             <option value="">Tüm Alış Yerleri</option>
@@ -302,8 +327,8 @@ export default function AdminRezervasyonlarPage() {
             ))}
           </select>
           <select
-            value={filterDropoff}
-            onChange={(e) => setFilterDropoff(e.target.value)}
+            value={draftDropoff}
+            onChange={(e) => setDraftDropoff(e.target.value)}
             className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
           >
             <option value="">Tüm İade Yerleri</option>
@@ -317,23 +342,31 @@ export default function AdminRezervasyonlarPage() {
             <label className="text-sm text-brown-500 whitespace-nowrap">Tarih Aralığı:</label>
             <input
               type="date"
-              value={filterFrom}
-              onChange={(e) => setFilterFrom(e.target.value)}
+              value={draftFrom}
+              onChange={(e) => setDraftFrom(e.target.value)}
               className="w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
             />
             <span className="text-brown-400">—</span>
             <input
               type="date"
-              value={filterTo}
-              onChange={(e) => setFilterTo(e.target.value)}
+              value={draftTo}
+              onChange={(e) => setDraftTo(e.target.value)}
               className="w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
             />
           </div>
         </div>
-        <p className="mt-3 text-xs text-brown-500">
-          {filteredReservations.length} / {reservations.length} rezervasyon gösteriliyor.
-        </p>
-      </div>
+        <div className="mt-4 flex items-center justify-between">
+          <button
+            type="submit"
+            className="rounded-lg bg-brown-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brown-600"
+          >
+            Ara
+          </button>
+          <p className="text-xs text-brown-500">
+            {filteredReservations.length} / {reservations.length} rezervasyon gösteriliyor.
+          </p>
+        </div>
+      </form>
 
       {showForm && (
         <form
