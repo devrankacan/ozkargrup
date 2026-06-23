@@ -71,7 +71,7 @@ body {
   width: 42vw;
   height: 42vw;
   background: radial-gradient(circle, var(--brown-300), transparent 70%);
-  animation: drift-1 18s ease-in-out infinite;
+  animation: drift-1 9s ease-in-out infinite;
 }
 
 .gradient-blob-2 {
@@ -80,7 +80,7 @@ body {
   width: 38vw;
   height: 38vw;
   background: radial-gradient(circle, var(--brown-400), transparent 70%);
-  animation: drift-2 22s ease-in-out infinite;
+  animation: drift-2 11s ease-in-out infinite;
 }
 
 .gradient-blob-3 {
@@ -89,22 +89,31 @@ body {
   width: 36vw;
   height: 36vw;
   background: radial-gradient(circle, var(--brown-200), transparent 70%);
-  animation: drift-3 26s ease-in-out infinite;
+  animation: drift-3 13s ease-in-out infinite;
 }
 
 @keyframes drift-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(10vw, 12vh) scale(1.25); }
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(16vw, 10vh) scale(1.2); }
+  50% { transform: translate(6vw, 20vh) scale(0.85); }
+  75% { transform: translate(-12vw, 6vh) scale(1.3); }
+  100% { transform: translate(0, 0) scale(1); }
 }
 
 @keyframes drift-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-12vw, 10vh) scale(1.2); }
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-18vw, 14vh) scale(1.25); }
+  50% { transform: translate(-8vw, -10vh) scale(0.9); }
+  75% { transform: translate(10vw, 8vh) scale(1.15); }
+  100% { transform: translate(0, 0) scale(1); }
 }
 
 @keyframes drift-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(9vw, -10vh) scale(1.3); }
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(14vw, -14vh) scale(1.3); }
+  50% { transform: translate(-10vw, -6vh) scale(0.9); }
+  75% { transform: translate(-16vw, 8vh) scale(1.1); }
+  100% { transform: translate(0, 0) scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
