@@ -96,7 +96,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="mx-auto max-w-6xl px-6 pt-10 pb-6">
         <div className="mb-8 flex items-end justify-between">
           <AnimatedHeading className="text-2xl font-bold text-brown-700">Öne Çıkan Araçlar</AnimatedHeading>
           <Link href="/araclar" className="text-sm font-medium text-brown-500 hover:text-brown-700">
@@ -142,7 +142,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="h-px bg-brown-200" />
+      </div>
+
+      <section className="mx-auto max-w-6xl px-6 pt-6 pb-16">
         <div className="mb-8 flex items-end justify-between">
           <AnimatedHeading className="text-2xl font-bold text-brown-700">Turlarımız</AnimatedHeading>
           <Link href="/turlar" className="text-sm font-medium text-brown-500 hover:text-brown-700">
