@@ -70,6 +70,13 @@ export default function AdminRezervasyonlarPage() {
   const [exportTo, setExportTo] = useState("");
   const [mailTemplates, setMailTemplates] = useState<Record<string, string>>({});
   const [sendingMailId, setSendingMailId] = useState<string | null>(null);
+  const [filterSearch, setFilterSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterCarId, setFilterCarId] = useState("");
+  const [filterPickup, setFilterPickup] = useState("");
+  const [filterDropoff, setFilterDropoff] = useState("");
+  const [filterFrom, setFilterFrom] = useState("");
+  const [filterTo, setFilterTo] = useState("");
 
   async function load() {
     const [resR, resC, resL] = await Promise.all([
@@ -179,6 +186,34 @@ export default function AdminRezervasyonlarPage() {
     window.open(`/api/admin/rezervasyonlar/export?${params.toString()}`, "_blank");
   }
 
+  function clearFilters() {
+    setFilterSearch("");
+    setFilterStatus("");
+    setFilterCarId("");
+    setFilterPickup("");
+    setFilterDropoff("");
+    setFilterFrom("");
+    setFilterTo("");
+  }
+
+  const filteredReservations = reservations.filter((r) => {
+    if (filterStatus && r.status !== filterStatus) return false;
+    if (filterCarId && r.carId !== filterCarId) return false;
+    if (filterPickup && r.pickupPlace !== filterPickup) return false;
+    if (filterDropoff && r.dropoffPlace !== filterDropoff) return false;
+    if (filterFrom && r.endDate.slice(0, 10) < filterFrom) return false;
+    if (filterTo && r.startDate.slice(0, 10) > filterTo) return false;
+    if (filterSearch) {
+      const q = filterSearch.toLocaleLowerCase("tr-TR");
+      const haystack = `${r.fullName} ${r.phone} ${r.email} ${r.car.brand} ${r.car.name}`.toLocaleLowerCase("tr-TR");
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const filtersActive =
+    filterSearch || filterStatus || filterCarId || filterPickup || filterDropoff || filterFrom || filterTo;
+
   if (loading) return <p className="text-brown-500">Yükleniyor...</p>;
 
   return (
@@ -214,6 +249,90 @@ export default function AdminRezervasyonlarPage() {
             </button>
           )}
         </div>
+      </div>
+
+      <div className="mb-6 rounded-xl border border-brown-200 bg-white p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-brown-700">Filtrele</h2>
+          {filtersActive && (
+            <button onClick={clearFilters} className="text-xs text-brown-500 hover:underline">
+              Filtreleri Temizle
+            </button>
+          )}
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <input
+            placeholder="Ad, telefon, e-posta veya araç ara..."
+            value={filterSearch}
+            onChange={(e) => setFilterSearch(e.target.value)}
+            className="rounded-lg border border-brown-200 px-3 py-2 text-sm sm:col-span-2 lg:col-span-2"
+          />
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
+          >
+            <option value="">Tüm Durumlar</option>
+            <option value="confirmed">Onaylandı</option>
+            <option value="pending">Bekliyor</option>
+            <option value="cancelled">İptal</option>
+          </select>
+          <select
+            value={filterCarId}
+            onChange={(e) => setFilterCarId(e.target.value)}
+            className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
+          >
+            <option value="">Tüm Araçlar</option>
+            {cars.map((car) => (
+              <option key={car.id} value={car.id}>
+                {car.brand} {car.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterPickup}
+            onChange={(e) => setFilterPickup(e.target.value)}
+            className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
+          >
+            <option value="">Tüm Alış Yerleri</option>
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.name}>
+                {loc.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterDropoff}
+            onChange={(e) => setFilterDropoff(e.target.value)}
+            className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
+          >
+            <option value="">Tüm İade Yerleri</option>
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.name}>
+                {loc.name}
+              </option>
+            ))}
+          </select>
+          <div className="flex items-center gap-2 sm:col-span-2 lg:col-span-2">
+            <label className="text-sm text-brown-500 whitespace-nowrap">Tarih Aralığı:</label>
+            <input
+              type="date"
+              value={filterFrom}
+              onChange={(e) => setFilterFrom(e.target.value)}
+              className="w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
+            />
+            <span className="text-brown-400">—</span>
+            <input
+              type="date"
+              value={filterTo}
+              onChange={(e) => setFilterTo(e.target.value)}
+              className="w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+        <p className="mt-3 text-xs text-brown-500">
+          {filteredReservations.length} / {reservations.length} rezervasyon gösteriliyor.
+        </p>
       </div>
 
       {showForm && (
@@ -335,7 +454,7 @@ export default function AdminRezervasyonlarPage() {
       )}
 
       <div className="space-y-4">
-        {reservations.map((r) => (
+        {filteredReservations.map((r) => (
           <div key={r.id} className="rounded-xl border border-brown-200 bg-white p-5">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
@@ -402,6 +521,9 @@ export default function AdminRezervasyonlarPage() {
           </div>
         ))}
         {reservations.length === 0 && <p className="text-brown-500">Henüz rezervasyon bulunmuyor.</p>}
+        {reservations.length > 0 && filteredReservations.length === 0 && (
+          <p className="text-brown-500">Filtrelere uyan rezervasyon bulunamadı.</p>
+        )}
       </div>
     </div>
   );

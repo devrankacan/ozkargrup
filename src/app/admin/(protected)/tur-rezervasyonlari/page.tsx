@@ -55,6 +55,11 @@ export default function AdminTurRezervasyonlariPage() {
   const [exportTo, setExportTo] = useState("");
   const [mailTemplates, setMailTemplates] = useState<Record<string, string>>({});
   const [sendingMailId, setSendingMailId] = useState<string | null>(null);
+  const [filterSearch, setFilterSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterEventId, setFilterEventId] = useState("");
+  const [filterFrom, setFilterFrom] = useState("");
+  const [filterTo, setFilterTo] = useState("");
 
   async function load() {
     const [resR, resE] = await Promise.all([
@@ -163,6 +168,30 @@ export default function AdminTurRezervasyonlariPage() {
     window.open(`/api/admin/tur-rezervasyonlari/export?${params.toString()}`, "_blank");
   }
 
+  function clearFilters() {
+    setFilterSearch("");
+    setFilterStatus("");
+    setFilterEventId("");
+    setFilterFrom("");
+    setFilterTo("");
+  }
+
+  const filteredReservations = reservations.filter((r) => {
+    if (filterStatus && r.status !== filterStatus) return false;
+    if (filterEventId && r.eventId !== filterEventId) return false;
+    const eventDate = r.event.eventDate.slice(0, 10);
+    if (filterFrom && eventDate < filterFrom) return false;
+    if (filterTo && eventDate > filterTo) return false;
+    if (filterSearch) {
+      const q = filterSearch.toLocaleLowerCase("tr-TR");
+      const haystack = `${r.fullName} ${r.phone} ${r.email || ""} ${r.event.tourName}`.toLocaleLowerCase("tr-TR");
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const filtersActive = filterSearch || filterStatus || filterEventId || filterFrom || filterTo;
+
   if (loading) return <p className="text-brown-500">Yükleniyor...</p>;
 
   return (
@@ -205,6 +234,66 @@ export default function AdminTurRezervasyonlariPage() {
           Önce "Tur Etkinlikleri" sayfasından bir etkinlik (tur + tarih) oluşturmalısınız.
         </p>
       )}
+
+      <div className="mb-6 rounded-xl border border-brown-200 bg-white p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-brown-700">Filtrele</h2>
+          {filtersActive && (
+            <button onClick={clearFilters} className="text-xs text-brown-500 hover:underline">
+              Filtreleri Temizle
+            </button>
+          )}
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <input
+            placeholder="Ad, telefon, e-posta veya tur ara..."
+            value={filterSearch}
+            onChange={(e) => setFilterSearch(e.target.value)}
+            className="rounded-lg border border-brown-200 px-3 py-2 text-sm sm:col-span-2 lg:col-span-2"
+          />
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
+          >
+            <option value="">Tüm Durumlar</option>
+            <option value="confirmed">Onaylandı</option>
+            <option value="pending">Bekliyor</option>
+            <option value="cancelled">İptal</option>
+          </select>
+          <select
+            value={filterEventId}
+            onChange={(e) => setFilterEventId(e.target.value)}
+            className="rounded-lg border border-brown-200 px-3 py-2 text-sm"
+          >
+            <option value="">Tüm Etkinlikler</option>
+            {events.map((ev) => (
+              <option key={ev.id} value={ev.id}>
+                {ev.tourName} — {new Date(ev.eventDate).toLocaleDateString("tr-TR")}
+              </option>
+            ))}
+          </select>
+          <div className="flex items-center gap-2 sm:col-span-2 lg:col-span-2">
+            <label className="text-sm text-brown-500 whitespace-nowrap">Tarih Aralığı:</label>
+            <input
+              type="date"
+              value={filterFrom}
+              onChange={(e) => setFilterFrom(e.target.value)}
+              className="w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
+            />
+            <span className="text-brown-400">—</span>
+            <input
+              type="date"
+              value={filterTo}
+              onChange={(e) => setFilterTo(e.target.value)}
+              className="w-full rounded-lg border border-brown-200 px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+        <p className="mt-3 text-xs text-brown-500">
+          {filteredReservations.length} / {reservations.length} rezervasyon gösteriliyor.
+        </p>
+      </div>
 
       {showForm && (
         <form
@@ -289,7 +378,7 @@ export default function AdminTurRezervasyonlariPage() {
       )}
 
       <div className="space-y-4">
-        {reservations.map((r) => (
+        {filteredReservations.map((r) => (
           <div key={r.id} className="rounded-xl border border-brown-200 bg-white p-5">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
@@ -353,6 +442,9 @@ export default function AdminTurRezervasyonlariPage() {
           </div>
         ))}
         {reservations.length === 0 && <p className="text-brown-500">Henüz tur rezervasyonu bulunmuyor.</p>}
+        {reservations.length > 0 && filteredReservations.length === 0 && (
+          <p className="text-brown-500">Filtrelere uyan rezervasyon bulunamadı.</p>
+        )}
       </div>
     </div>
   );
