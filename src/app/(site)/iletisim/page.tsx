@@ -23,7 +23,7 @@ export default function IletisimPage() {
         </div>
         <div>
           <h3 className="font-semibold text-brown-700">Adres</h3>
-          <p>Örnek Mahallesi, Örnek Caddesi No:1</p>
+          <p>Konaklar, Aker Sk. no:1, 61000 Ortahisar/Trabzon</p>
         </div>
       </div>
       <ContactForm />
