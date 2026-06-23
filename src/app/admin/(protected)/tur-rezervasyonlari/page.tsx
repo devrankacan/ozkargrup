@@ -235,8 +235,8 @@ export default function AdminTurRezervasyonlariPage() {
             className="rounded-lg border border-brown-200 px-3 py-2"
           />
           <input
-            type="email"
-            placeholder="E-posta (opsiyonel)"
+            type="text"
+            placeholder="E-posta (opsiyonel, birden fazla için virgülle ayırın)"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             className="rounded-lg border border-brown-200 px-3 py-2"

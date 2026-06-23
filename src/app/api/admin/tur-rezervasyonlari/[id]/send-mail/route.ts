@@ -26,7 +26,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     logoUrl: settings.logoUrl,
     itemLabel: reservation.tourName,
     dateRangeText: reservation.tourDate.toLocaleDateString("tr-TR"),
-    detailRows: [{ label: "Kişi Sayısı", value: `${reservation.peopleCount} kişi` }],
+    detailRows: [],
     template,
   });
 
