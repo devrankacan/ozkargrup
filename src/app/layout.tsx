@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SITE_URL } from "@/lib/site";
 import { getSiteSettings } from "@/lib/siteSettings";
+import GradientBackground from "@/components/animations/GradientBackground";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -53,7 +54,10 @@ export default function RootLayout({
       lang="tr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-white text-foreground">{children}</body>
+      <body className="min-h-full flex flex-col bg-white text-foreground">
+        <GradientBackground />
+        {children}
+      </body>
     </html>
   );
 }
