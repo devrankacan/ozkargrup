@@ -19,7 +19,7 @@ export default function IletisimPage() {
         </div>
         <div>
           <h3 className="font-semibold text-brown-700">E-posta</h3>
-          <p>info@ozkargrup.com</p>
+          <p>info@ozkargroup.com.tr</p>
         </div>
         <div>
           <h3 className="font-semibold text-brown-700">Adres</h3>

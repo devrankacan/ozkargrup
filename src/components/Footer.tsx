@@ -44,7 +44,7 @@ export default async function Footer() {
           <div>
             <h3 className="mb-2 font-semibold text-brown-700">İletişim</h3>
             <p>Tel / WhatsApp: +90 541 912 14 61</p>
-            <p>E-posta: info@ozkargrup.com</p>
+            <p>E-posta: info@ozkargroup.com.tr</p>
             <p className="mt-2">Konaklar, Aker Sk. no:1, 61000 Ortahisar/Trabzon</p>
           </div>
           <div>
