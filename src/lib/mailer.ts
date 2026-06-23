@@ -2,6 +2,7 @@ import nodemailer from "nodemailer";
 import { SITE_URL } from "@/lib/site";
 
 export type EmailTemplate = "confirmed" | "reminder" | "completed";
+export type ReservationKind = "car" | "tour";
 
 function getTransporter() {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
@@ -22,7 +23,12 @@ function absoluteUrl(url?: string | null) {
 
 const templateContent: Record<
   EmailTemplate,
-  { subject: (itemLabel: string) => string; icon: string; title: string; body: (fullName: string, itemLabel: string) => string }
+  {
+    subject: (itemLabel: string) => string;
+    icon: string;
+    title: string;
+    body: (fullName: string, itemLabel: string, kind: ReservationKind) => string;
+  }
 > = {
   confirmed: {
     subject: (itemLabel) => `Rezervasyonunuz Onaylandı - ${itemLabel}`,
@@ -42,8 +48,10 @@ const templateContent: Record<
     subject: (itemLabel) => `Teşekkür Ederiz - ${itemLabel}`,
     icon: "https://cdn-icons-png.flaticon.com/512/411/411736.png",
     title: "Bizi Tercih Ettiğiniz İçin Teşekkür Ederiz",
-    body: (fullName, itemLabel) =>
-      `Sayın ${fullName}, ${itemLabel} sona ermiştir. Bizi tercih ettiğiniz için teşekkür ederiz. Şikayet ve önerilerinizi bize iletebilirsiniz.`,
+    body: (fullName, itemLabel, kind) =>
+      kind === "car"
+        ? `Sayın ${fullName}, ${itemLabel} için kiralama süreniz sona ermiştir. Bizi tercih ettiğiniz için teşekkür ederiz. Şikayet ve önerilerinizi bize iletebilirsiniz.`
+        : `Sayın ${fullName}, ${itemLabel} sona ermiştir. Bizi tercih ettiğiniz için teşekkür ederiz. Şikayet ve önerilerinizi bize iletebilirsiniz.`,
   },
 };
 
@@ -55,6 +63,7 @@ type ReservationEmailInput = {
   dateRangeText: string;
   detailRows: { label: string; value: string }[];
   template: EmailTemplate;
+  kind?: ReservationKind;
 };
 
 export async function sendReservationEmail(input: ReservationEmailInput) {
@@ -91,7 +100,7 @@ export async function sendReservationEmail(input: ReservationEmailInput) {
             </td>
             <td>
               <h1 style="margin:0;font-size:20px;color:#3e2723;">${content.title}</h1>
-              <p style="margin:6px 0 0;font-size:14px;color:#6d4c41;">${content.body(input.fullName, input.itemLabel)}</p>
+              <p style="margin:6px 0 0;font-size:14px;color:#6d4c41;">${content.body(input.fullName, input.itemLabel, input.kind || "tour")}</p>
             </td>
           </tr>
         </table>

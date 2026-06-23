@@ -29,8 +29,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     detailRows: [
       { label: "Alış Yeri", value: reservation.pickupPlace },
       { label: "İade Yeri", value: reservation.dropoffPlace },
+      { label: "Kategori", value: reservation.car.category },
+      { label: "Vites", value: reservation.car.transmission },
+      { label: "Yakıt", value: reservation.car.fuelType },
+      { label: "Koltuk", value: `${reservation.car.seats} kişi` },
     ],
     template,
+    kind: "car",
   });
 
   return NextResponse.json({ success: true });

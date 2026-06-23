@@ -184,7 +184,7 @@ export default function AdminRezervasyonlarPage() {
   return (
     <div>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-brown-700">Rezervasyonlar</h1>
+        <h1 className="text-2xl font-bold text-brown-700">Araç Kiralama</h1>
         <div className="flex flex-wrap items-center gap-2">
           <input
             type="date"
