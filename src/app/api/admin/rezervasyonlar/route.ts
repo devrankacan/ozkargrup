@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { findOverlappingReservation } from "@/lib/reservations";
+import { sendReservationConfirmationEmail } from "@/lib/mailer";
+import { getSiteSettings } from "@/lib/siteSettings";
 
 export async function GET() {
   const { error } = await requireAdmin();
@@ -46,5 +48,21 @@ export async function POST(req: NextRequest) {
     },
     include: { car: true },
   });
+
+  if (reservation.email) {
+    const settings = await getSiteSettings();
+    sendReservationConfirmationEmail({
+      to: reservation.email,
+      fullName: reservation.fullName,
+      logoUrl: settings.logoUrl,
+      itemLabel: `${reservation.car.brand} ${reservation.car.name}`,
+      dateRangeText: `${reservation.startDate.toLocaleDateString("tr-TR")} → ${reservation.endDate.toLocaleDateString("tr-TR")}`,
+      detailRows: [
+        { label: "Alış Yeri", value: reservation.pickupPlace },
+        { label: "İade Yeri", value: reservation.dropoffPlace },
+      ],
+    }).catch((err) => console.error("Onay e-postası gönderilemedi:", err));
+  }
+
   return NextResponse.json(reservation, { status: 201 });
 }
