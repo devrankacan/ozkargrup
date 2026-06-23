@@ -1,31 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { tours } from "@/lib/tours";
 
-type Reservation = {
+type TourReservation = {
   id: string;
-  carId: string;
+  tourSlug: string;
+  tourName: string;
   fullName: string;
-  email: string;
+  email: string | null;
   phone: string;
-  startDate: string;
-  endDate: string;
-  pickupPlace: string;
-  dropoffPlace: string;
+  peopleCount: number;
+  tourDate: string;
   notes: string | null;
   status: string;
-  car: { id: string; brand: string; name: string };
-};
-
-type Car = {
-  id: string;
-  name: string;
-  brand: string;
-};
-
-type Location = {
-  id: string;
-  name: string;
 };
 
 const statusLabels: Record<string, string> = {
@@ -41,14 +29,12 @@ const statusColors: Record<string, string> = {
 };
 
 const emptyForm = {
-  carId: "",
+  tourSlug: "",
   fullName: "",
   email: "",
   phone: "",
-  startDate: "",
-  endDate: "",
-  pickupPlace: "",
-  dropoffPlace: "",
+  peopleCount: "1",
+  tourDate: "",
   notes: "",
   status: "confirmed",
 };
@@ -57,10 +43,8 @@ function toDateInputValue(value: string) {
   return value ? value.slice(0, 10) : "";
 }
 
-export default function AdminRezervasyonlarPage() {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [cars, setCars] = useState<Car[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
+export default function AdminTurRezervasyonlariPage() {
+  const [reservations, setReservations] = useState<TourReservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -70,14 +54,8 @@ export default function AdminRezervasyonlarPage() {
   const [exportTo, setExportTo] = useState("");
 
   async function load() {
-    const [resR, resC, resL] = await Promise.all([
-      fetch("/api/admin/rezervasyonlar"),
-      fetch("/api/admin/araclar"),
-      fetch("/api/admin/lokasyonlar"),
-    ]);
-    setReservations(await resR.json());
-    setCars(await resC.json());
-    setLocations(await resL.json());
+    const res = await fetch("/api/admin/tur-rezervasyonlari");
+    setReservations(await res.json());
     setLoading(false);
   }
 
@@ -88,12 +66,17 @@ export default function AdminRezervasyonlarPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFormError("");
-    const url = editingId ? `/api/admin/rezervasyonlar/${editingId}` : "/api/admin/rezervasyonlar";
+    const tour = tours.find((t) => t.slug === form.tourSlug);
+    if (!tour) {
+      setFormError("Lütfen bir tur seçin.");
+      return;
+    }
+    const url = editingId ? `/api/admin/tur-rezervasyonlari/${editingId}` : "/api/admin/tur-rezervasyonlari";
     const method = editingId ? "PATCH" : "POST";
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, tourName: tour.name, peopleCount: Number(form.peopleCount) }),
     });
     if (!res.ok) {
       const err = await res.json();
@@ -106,19 +89,17 @@ export default function AdminRezervasyonlarPage() {
     load();
   }
 
-  function startEdit(r: Reservation) {
+  function startEdit(r: TourReservation) {
     setEditingId(r.id);
     setShowForm(true);
     setFormError("");
     setForm({
-      carId: r.carId,
+      tourSlug: r.tourSlug,
       fullName: r.fullName,
-      email: r.email,
+      email: r.email || "",
       phone: r.phone,
-      startDate: toDateInputValue(r.startDate),
-      endDate: toDateInputValue(r.endDate),
-      pickupPlace: r.pickupPlace,
-      dropoffPlace: r.dropoffPlace,
+      peopleCount: String(r.peopleCount),
+      tourDate: toDateInputValue(r.tourDate),
       notes: r.notes || "",
       status: r.status,
     });
@@ -139,7 +120,7 @@ export default function AdminRezervasyonlarPage() {
   }
 
   async function updateStatus(id: string, status: string) {
-    await fetch(`/api/admin/rezervasyonlar/${id}`, {
+    await fetch(`/api/admin/tur-rezervasyonlari/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -149,7 +130,7 @@ export default function AdminRezervasyonlarPage() {
 
   async function remove(id: string) {
     if (!confirm("Bu rezervasyonu silmek istediğinize emin misiniz?")) return;
-    await fetch(`/api/admin/rezervasyonlar/${id}`, { method: "DELETE" });
+    await fetch(`/api/admin/tur-rezervasyonlari/${id}`, { method: "DELETE" });
     load();
   }
 
@@ -157,7 +138,7 @@ export default function AdminRezervasyonlarPage() {
     const params = new URLSearchParams();
     if (exportFrom) params.set("from", exportFrom);
     if (exportTo) params.set("to", exportTo);
-    window.open(`/api/admin/rezervasyonlar/export?${params.toString()}`, "_blank");
+    window.open(`/api/admin/tur-rezervasyonlari/export?${params.toString()}`, "_blank");
   }
 
   if (loading) return <p className="text-brown-500">Yükleniyor...</p>;
@@ -165,7 +146,7 @@ export default function AdminRezervasyonlarPage() {
   return (
     <div>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-brown-700">Rezervasyonlar</h1>
+        <h1 className="text-2xl font-bold text-brown-700">Tur Rezervasyonları</h1>
         <div className="flex flex-wrap items-center gap-2">
           <input
             type="date"
@@ -191,7 +172,7 @@ export default function AdminRezervasyonlarPage() {
               onClick={startCreate}
               className="rounded-lg bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600"
             >
-              + Yeni Rezervasyon (Elden)
+              + Yeni Tur Rezervasyonu (Elden)
             </button>
           )}
         </div>
@@ -207,16 +188,16 @@ export default function AdminRezervasyonlarPage() {
           )}
           <select
             required
-            value={form.carId}
-            onChange={(e) => setForm({ ...form, carId: e.target.value })}
+            value={form.tourSlug}
+            onChange={(e) => setForm({ ...form, tourSlug: e.target.value })}
             className="rounded-lg border border-brown-200 px-3 py-2 sm:col-span-2"
           >
             <option value="" disabled>
-              Araç seçin
+              Tur seçin
             </option>
-            {cars.map((car) => (
-              <option key={car.id} value={car.id}>
-                {car.brand} {car.name}
+            {tours.map((tour) => (
+              <option key={tour.slug} value={tour.slug}>
+                {tour.name}
               </option>
             ))}
           </select>
@@ -239,52 +220,26 @@ export default function AdminRezervasyonlarPage() {
             placeholder="E-posta (opsiyonel)"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="rounded-lg border border-brown-200 px-3 py-2 sm:col-span-2"
+            className="rounded-lg border border-brown-200 px-3 py-2"
+          />
+          <input
+            type="number"
+            min={1}
+            placeholder="Kişi Sayısı"
+            value={form.peopleCount}
+            onChange={(e) => setForm({ ...form, peopleCount: e.target.value })}
+            className="rounded-lg border border-brown-200 px-3 py-2"
           />
           <div>
-            <label className="mb-1 block text-sm font-medium text-brown-700">Alış Tarihi</label>
+            <label className="mb-1 block text-sm font-medium text-brown-700">Tur Tarihi</label>
             <input
               required
               type="date"
-              value={form.startDate}
-              onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+              value={form.tourDate}
+              onChange={(e) => setForm({ ...form, tourDate: e.target.value })}
               className="w-full rounded-lg border border-brown-200 px-3 py-2"
             />
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-brown-700">İade Tarihi</label>
-            <input
-              required
-              type="date"
-              value={form.endDate}
-              onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-              className="w-full rounded-lg border border-brown-200 px-3 py-2"
-            />
-          </div>
-          <select
-            value={form.pickupPlace}
-            onChange={(e) => setForm({ ...form, pickupPlace: e.target.value })}
-            className="rounded-lg border border-brown-200 px-3 py-2"
-          >
-            <option value="">Alış yeri seçin</option>
-            {locations.map((loc) => (
-              <option key={loc.id} value={loc.name}>
-                {loc.name}
-              </option>
-            ))}
-          </select>
-          <select
-            value={form.dropoffPlace}
-            onChange={(e) => setForm({ ...form, dropoffPlace: e.target.value })}
-            className="rounded-lg border border-brown-200 px-3 py-2"
-          >
-            <option value="">İade yeri seçin</option>
-            {locations.map((loc) => (
-              <option key={loc.id} value={loc.name}>
-                {loc.name}
-              </option>
-            ))}
-          </select>
           <select
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value })}
@@ -321,14 +276,11 @@ export default function AdminRezervasyonlarPage() {
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <p className="font-semibold text-brown-700">
-                  {r.fullName} — {r.car.brand} {r.car.name}
+                  {r.fullName} — {r.tourName}
                 </p>
                 <p className="text-sm text-brown-500">{r.email} · {r.phone}</p>
                 <p className="mt-1 text-sm text-brown-600">
-                  {new Date(r.startDate).toLocaleDateString("tr-TR")} → {new Date(r.endDate).toLocaleDateString("tr-TR")}
-                </p>
-                <p className="text-sm text-brown-500">
-                  Alış: {r.pickupPlace} · İade: {r.dropoffPlace}
+                  {new Date(r.tourDate).toLocaleDateString("tr-TR")} · {r.peopleCount} kişi
                 </p>
                 {r.notes && <p className="mt-1 text-sm text-brown-500">Not: {r.notes}</p>}
               </div>
@@ -364,7 +316,7 @@ export default function AdminRezervasyonlarPage() {
             </div>
           </div>
         ))}
-        {reservations.length === 0 && <p className="text-brown-500">Henüz rezervasyon bulunmuyor.</p>}
+        {reservations.length === 0 && <p className="text-brown-500">Henüz tur rezervasyonu bulunmuyor.</p>}
       </div>
     </div>
   );
