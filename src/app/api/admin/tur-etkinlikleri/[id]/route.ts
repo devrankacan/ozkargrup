@@ -9,20 +9,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
   const body = await req.json();
 
-  const reservation = await prisma.tourReservation.update({
+  const event = await prisma.tourEvent.update({
     where: { id },
     data: {
-      eventId: body.eventId,
-      fullName: body.fullName,
-      email: body.email,
-      phone: body.phone,
-      peopleCount: body.peopleCount ? Number(body.peopleCount) : undefined,
+      tourSlug: body.tourSlug,
+      tourName: body.tourName,
+      eventDate: body.eventDate ? new Date(body.eventDate) : undefined,
       notes: body.notes,
-      status: body.status,
     },
-    include: { event: true },
   });
-  return NextResponse.json(reservation);
+  return NextResponse.json(event);
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -30,6 +26,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (error) return error;
 
   const { id } = await params;
-  await prisma.tourReservation.delete({ where: { id } });
+  await prisma.tourReservation.deleteMany({ where: { eventId: id } });
+  await prisma.tourEvent.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }

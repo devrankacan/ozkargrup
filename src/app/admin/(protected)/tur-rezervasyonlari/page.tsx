@@ -1,17 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { tours } from "@/lib/tours";
 
-type TourReservation = {
+type TourEvent = {
   id: string;
   tourSlug: string;
   tourName: string;
+  eventDate: string;
+};
+
+type TourReservation = {
+  id: string;
+  eventId: string;
+  event: TourEvent;
   fullName: string;
   email: string | null;
   phone: string;
   peopleCount: number;
-  tourDate: string;
   notes: string | null;
   status: string;
 };
@@ -29,22 +34,18 @@ const statusColors: Record<string, string> = {
 };
 
 const emptyForm = {
-  tourSlug: "",
+  eventId: "",
   fullName: "",
   email: "",
   phone: "",
   peopleCount: "1",
-  tourDate: "",
   notes: "",
   status: "confirmed",
 };
 
-function toDateInputValue(value: string) {
-  return value ? value.slice(0, 10) : "";
-}
-
 export default function AdminTurRezervasyonlariPage() {
   const [reservations, setReservations] = useState<TourReservation[]>([]);
+  const [events, setEvents] = useState<TourEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -56,8 +57,12 @@ export default function AdminTurRezervasyonlariPage() {
   const [sendingMailId, setSendingMailId] = useState<string | null>(null);
 
   async function load() {
-    const res = await fetch("/api/admin/tur-rezervasyonlari");
-    setReservations(await res.json());
+    const [resR, resE] = await Promise.all([
+      fetch("/api/admin/tur-rezervasyonlari"),
+      fetch("/api/admin/tur-etkinlikleri"),
+    ]);
+    setReservations(await resR.json());
+    setEvents(await resE.json());
     setLoading(false);
   }
 
@@ -68,9 +73,8 @@ export default function AdminTurRezervasyonlariPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFormError("");
-    const tour = tours.find((t) => t.slug === form.tourSlug);
-    if (!tour) {
-      setFormError("Lütfen bir tur seçin.");
+    if (!form.eventId) {
+      setFormError("Lütfen bir etkinlik seçin.");
       return;
     }
     const url = editingId ? `/api/admin/tur-rezervasyonlari/${editingId}` : "/api/admin/tur-rezervasyonlari";
@@ -78,7 +82,7 @@ export default function AdminTurRezervasyonlariPage() {
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, tourName: tour.name, peopleCount: Number(form.peopleCount) }),
+      body: JSON.stringify({ ...form, peopleCount: Number(form.peopleCount) }),
     });
     if (!res.ok) {
       const err = await res.json();
@@ -96,12 +100,11 @@ export default function AdminTurRezervasyonlariPage() {
     setShowForm(true);
     setFormError("");
     setForm({
-      tourSlug: r.tourSlug,
+      eventId: r.eventId,
       fullName: r.fullName,
       email: r.email || "",
       phone: r.phone,
       peopleCount: String(r.peopleCount),
-      tourDate: toDateInputValue(r.tourDate),
       notes: r.notes || "",
       status: r.status,
     });
@@ -197,6 +200,12 @@ export default function AdminTurRezervasyonlariPage() {
         </div>
       </div>
 
+      {events.length === 0 && (
+        <p className="mb-4 rounded-lg bg-yellow-50 px-4 py-3 text-sm text-yellow-700">
+          Önce "Tur Etkinlikleri" sayfasından bir etkinlik (tur + tarih) oluşturmalısınız.
+        </p>
+      )}
+
       {showForm && (
         <form
           onSubmit={handleSubmit}
@@ -207,16 +216,16 @@ export default function AdminTurRezervasyonlariPage() {
           )}
           <select
             required
-            value={form.tourSlug}
-            onChange={(e) => setForm({ ...form, tourSlug: e.target.value })}
+            value={form.eventId}
+            onChange={(e) => setForm({ ...form, eventId: e.target.value })}
             className="rounded-lg border border-brown-200 px-3 py-2 sm:col-span-2"
           >
             <option value="" disabled>
-              Tur seçin
+              Etkinlik seçin
             </option>
-            {tours.map((tour) => (
-              <option key={tour.slug} value={tour.slug}>
-                {tour.name}
+            {events.map((ev) => (
+              <option key={ev.id} value={ev.id}>
+                {ev.tourName} — {new Date(ev.eventDate).toLocaleDateString("tr-TR")}
               </option>
             ))}
           </select>
@@ -249,16 +258,6 @@ export default function AdminTurRezervasyonlariPage() {
             onChange={(e) => setForm({ ...form, peopleCount: e.target.value })}
             className="rounded-lg border border-brown-200 px-3 py-2"
           />
-          <div>
-            <label className="mb-1 block text-sm font-medium text-brown-700">Tur Tarihi</label>
-            <input
-              required
-              type="date"
-              value={form.tourDate}
-              onChange={(e) => setForm({ ...form, tourDate: e.target.value })}
-              className="w-full rounded-lg border border-brown-200 px-3 py-2"
-            />
-          </div>
           <select
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value })}
@@ -295,11 +294,11 @@ export default function AdminTurRezervasyonlariPage() {
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <p className="font-semibold text-brown-700">
-                  {r.fullName} — {r.tourName}
+                  {r.fullName} — {r.event.tourName}
                 </p>
                 <p className="text-sm text-brown-500">{r.email} · {r.phone}</p>
                 <p className="mt-1 text-sm text-brown-600">
-                  {new Date(r.tourDate).toLocaleDateString("tr-TR")} · {r.peopleCount} kişi
+                  {new Date(r.event.eventDate).toLocaleDateString("tr-TR")} · {r.peopleCount} kişi
                 </p>
                 {r.notes && <p className="mt-1 text-sm text-brown-500">Not: {r.notes}</p>}
               </div>

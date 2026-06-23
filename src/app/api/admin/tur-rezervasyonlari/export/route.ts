@@ -19,18 +19,21 @@ export async function GET(req: NextRequest) {
 
   const reservations = await prisma.tourReservation.findMany({
     where: {
-      ...(from && { tourDate: { gte: new Date(from) } }),
-      ...(to && { tourDate: { lte: new Date(`${to}T23:59:59`) } }),
+      event: {
+        ...(from && { eventDate: { gte: new Date(from) } }),
+        ...(to && { eventDate: { lte: new Date(`${to}T23:59:59`) } }),
+      },
     },
-    orderBy: { tourDate: "asc" },
+    include: { event: true },
+    orderBy: { event: { eventDate: "asc" } },
   });
 
   const rows = reservations.map((r) => ({
     "Ad Soyad": r.fullName,
     "Telefon": r.phone,
     "E-posta": r.email || "",
-    "Tur": r.tourName,
-    "Tur Tarihi": r.tourDate.toLocaleDateString("tr-TR"),
+    "Tur": r.event.tourName,
+    "Tur Tarihi": r.event.eventDate.toLocaleDateString("tr-TR"),
     "Kişi Sayısı": r.peopleCount,
     "Durum": statusLabels[r.status] || r.status,
     "Not": r.notes || "",

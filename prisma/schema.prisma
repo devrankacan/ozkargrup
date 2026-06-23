@@ -99,16 +99,25 @@ model ContactMessage {
   createdAt DateTime @default(now())
 }
 
+model TourEvent {
+  id           String            @id @default(cuid())
+  tourSlug     String
+  tourName     String
+  eventDate    DateTime
+  notes        String?
+  createdAt    DateTime          @default(now())
+  reservations TourReservation[]
+}
+
 model TourReservation {
-  id          String   @id @default(cuid())
-  tourSlug    String
-  tourName    String
+  id          String    @id @default(cuid())
+  eventId     String
+  event       TourEvent @relation(fields: [eventId], references: [id])
   fullName    String
   email       String?
   phone       String
-  peopleCount Int      @default(1)
-  tourDate    DateTime
+  peopleCount Int       @default(1)
   notes       String?
-  status      String   @default("confirmed")
-  createdAt   DateTime @default(now())
+  status      String    @default("confirmed")
+  createdAt   DateTime  @default(now())
 }

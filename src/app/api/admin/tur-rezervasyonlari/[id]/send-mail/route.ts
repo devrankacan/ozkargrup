@@ -11,7 +11,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   const { template } = (await req.json()) as { template: EmailTemplate };
 
-  const reservation = await prisma.tourReservation.findUnique({ where: { id } });
+  const reservation = await prisma.tourReservation.findUnique({ where: { id }, include: { event: true } });
   if (!reservation) {
     return NextResponse.json({ error: "Rezervasyon bulunamadı." }, { status: 404 });
   }
@@ -24,8 +24,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     to: reservation.email,
     fullName: reservation.fullName,
     logoUrl: settings.logoUrl,
-    itemLabel: reservation.tourName,
-    dateRangeText: reservation.tourDate.toLocaleDateString("tr-TR"),
+    itemLabel: reservation.event.tourName,
+    dateRangeText: reservation.event.eventDate.toLocaleDateString("tr-TR"),
     detailRows: [],
     template,
   });
