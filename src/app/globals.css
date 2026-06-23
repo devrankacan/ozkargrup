@@ -49,12 +49,20 @@ body {
   }
 }
 
+.gradient-bg-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  isolation: isolate;
+}
+
 .gradient-blob {
   position: absolute;
   border-radius: 50%;
   filter: blur(40px);
   opacity: 0.6;
   will-change: transform;
+  transform: translateZ(0);
+  animation-fill-mode: both;
 }
 
 .gradient-blob-1 {
