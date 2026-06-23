@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { SITE_URL } from "@/lib/site";
+import { tours } from "@/lib/tours";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const cars = await prisma.car.findMany({
@@ -11,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     "",
     "/araclar",
+    "/turlar",
     "/kampanyalar",
     "/hakkimizda",
     "/sss",
@@ -28,5 +30,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: car.createdAt,
   }));
 
-  return [...staticRoutes, ...carRoutes];
+  const tourRoutes = tours.map((tour) => ({
+    url: `${SITE_URL}/turlar/${tour.slug}`,
+    lastModified: new Date(),
+  }));
+
+  return [...staticRoutes, ...carRoutes, ...tourRoutes];
 }

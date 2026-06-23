@@ -5,6 +5,7 @@ import MobileMenu from "@/components/MobileMenu";
 const links = [
   { href: "/", label: "Anasayfa" },
   { href: "/araclar", label: "Araçlar" },
+  { href: "/turlar", label: "Turlar" },
   { href: "/kampanyalar", label: "Kampanyalar" },
   { href: "/hakkimizda", label: "Hakkımızda" },
   { href: "/iletisim", label: "İletişim" },

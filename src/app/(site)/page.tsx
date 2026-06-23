@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import QuickBookingWidget from "@/components/QuickBookingWidget";
 import { getSiteSettings } from "@/lib/siteSettings";
+import { tours } from "@/lib/tours";
 
 export const revalidate = 0;
 
@@ -111,6 +112,33 @@ export default async function HomePage() {
           {cars.length === 0 && (
             <p className="text-brown-500">Henüz araç eklenmemiş.</p>
           )}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <div className="mb-8 flex items-end justify-between">
+          <h2 className="text-2xl font-bold text-brown-700">Turlarımız</h2>
+          <Link href="/turlar" className="text-sm font-medium text-brown-500 hover:text-brown-700">
+            Tüm turları gör →
+          </Link>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {tours.map((tour) => (
+            <Link
+              key={tour.slug}
+              href={`/turlar/${tour.slug}`}
+              className="block overflow-hidden rounded-xl border border-brown-200 bg-white shadow-sm transition hover:shadow-md"
+            >
+              <div className="h-40 w-full overflow-hidden bg-brown-100">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={tour.imageUrl} alt={tour.name} className="h-full w-full object-cover" />
+              </div>
+              <div className="p-4">
+                <h3 className="font-semibold text-brown-700">{tour.name}</h3>
+                <p className="text-sm text-brown-500">{tour.location}</p>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
