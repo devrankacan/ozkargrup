@@ -15,7 +15,7 @@ export default function IletisimPage() {
       <div className="mb-10 grid gap-4 text-brown-600 sm:grid-cols-3">
         <div>
           <h3 className="font-semibold text-brown-700">Telefon</h3>
-          <p>+90 530 910 54 61</p>
+          <p>+90 541 912 14 61</p>
         </div>
         <div>
           <h3 className="font-semibold text-brown-700">E-posta</h3>

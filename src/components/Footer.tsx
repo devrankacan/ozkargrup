@@ -43,9 +43,9 @@ export default async function Footer() {
           </div>
           <div>
             <h3 className="mb-2 font-semibold text-brown-700">İletişim</h3>
-            <p>Tel: +90 555 000 00 00</p>
+            <p>Tel / WhatsApp: +90 541 912 14 61</p>
             <p>E-posta: info@ozkargrup.com</p>
-            <p className="mt-2">Örnek Mahallesi, Örnek Caddesi No:1, Türkiye</p>
+            <p className="mt-2">Konaklar, Aker Sk. no:1, 61000 Ortahisar/Trabzon</p>
           </div>
           <div>
             <h3 className="mb-2 font-semibold text-brown-700">Bülten</h3>
@@ -53,9 +53,10 @@ export default async function Footer() {
             <NewsletterForm />
           </div>
         </div>
-        <p className="mt-8 border-t border-brown-200 pt-4 text-center text-xs text-brown-400">
-          © {new Date().getFullYear()} Özkar Grup Rent a Car. Tüm hakları saklıdır.
-        </p>
+        <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-brown-200 pt-4 text-center text-xs text-brown-400 sm:flex-row sm:text-left">
+          <p>© {new Date().getFullYear()} Özkar Grup Rent a Car. Tüm hakları saklıdır.</p>
+          <p>TÜRSAB No: 8459</p>
+        </div>
       </div>
     </footer>
   );

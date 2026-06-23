@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { tours } from "@/lib/tours";
 
-const WHATSAPP_NUMBER = "905309105461";
+const WHATSAPP_NUMBER = "905419121461";
 
 export function generateStaticParams() {
   return tours.map((tour) => ({ slug: tour.slug }));
